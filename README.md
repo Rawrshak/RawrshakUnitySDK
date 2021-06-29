@@ -1,6 +1,13 @@
 ## RawrshakUnitySDK
 Unity SDK for the Rawrshak Platform
 
+# Versions in Use
+Unity: 2020.3.12f1
+Nethereum: 3.8.0, net461AOT
+graphQL-client-unity: https://github.com/Gazuntype/graphQL-client-unity
+
+Note: Asset bundles are backward compatible but not forward compatible.
+
 # Todo:
 1. Rawrshak Menu
     - Wallet Tab
