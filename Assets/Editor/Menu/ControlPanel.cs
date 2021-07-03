@@ -1,8 +1,14 @@
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+
 using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEditor;
+using ZXing;
+using ZXing.QrCode;
 
 public class ControlPanel : EditorWindow
 {
@@ -23,6 +29,7 @@ public class ControlPanel : EditorWindow
     private int selectedWalletLoad = 0;
     private string errorString = null;
     private bool showQRCode = false;
+    private Texture2D QrCodeTexture;
 
     [MenuItem("Rawrshak/Control Panel")]
     static void OpenWindow()
@@ -47,6 +54,10 @@ public class ControlPanel : EditorWindow
         headerTexture = new Texture2D(1,1);
         headerTexture.SetPixel(0, 0, headerBGColor);
         headerTexture.Apply();
+
+        // QrCodeTexture = new Texture2D(256,256);
+        // QrCodeTexture.SetPixel(0, 0, headerBGColor);
+        // QrCodeTexture.Apply();
     }
 
     private void InitData() {
@@ -132,7 +143,7 @@ public class ControlPanel : EditorWindow
         GUILayout.EndArea();
     }
 
-    private void DrawWalletTab() {
+    private async void DrawWalletTab() {
         GUILayout.Label("Wallet", EditorStyles.boldLabel);
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Load Private Key", GUILayout.Width(position.width/2f), GUILayout.Height(30))) {
@@ -154,7 +165,28 @@ public class ControlPanel : EditorWindow
                 if (showQRCode == true) {
                     wallet.ShowWalletConnectQRCode();
                     showQRCode = false;
+
+                    var writer = new BarcodeWriter()
+                    {
+                        Format = BarcodeFormat.QR_CODE,
+                        Options = new QrCodeEncodingOptions
+                        {
+                            Height = (int)position.width,
+                            Width = (int)position.width
+                        }
+                    };
+
+                    QrCodeTexture = new Texture2D((int)position.width,(int)position.width);
+                    QrCodeTexture.SetPixels32(writer.Write(wallet.walletConnect.URI));
+                    QrCodeTexture.Apply();
+                    
+                    // GUI.DrawTexture(new Rect(0,0,256,256), QrCodeTexture, ScaleMode.ScaleToFit);
+                    
                 }
+                // var rect = new Rect(position.width/2f - 200, position.height/2f - 200, 400, 400);
+                // GUI.DrawTexture(rect, QrCodeTexture);
+                GUILayout.Box(QrCodeTexture);
+                
                 break;
             }
             case 0:
@@ -162,7 +194,7 @@ public class ControlPanel : EditorWindow
                 wallet.privateKey = EditorGUILayout.TextField("Private Key", wallet.privateKey);
                 break;
             }
-        }
+        }       
 
         GUILayout.FlexibleSpace();
         if (errorString != null) {
@@ -170,7 +202,9 @@ public class ControlPanel : EditorWindow
         }
 
         if (GUILayout.Button("Load Wallet", GUILayout.Width(position.width), GUILayout.Height(30))) {
-            wallet.LoadWallet(selectedWalletLoad);
+            Debug.Log("before: " + Thread.CurrentThread.ManagedThreadId);
+            await Task.Run(() => AttemptToConnect());
+            Debug.Log("after: " + Thread.CurrentThread.ManagedThreadId);
         }
     }
 
@@ -185,6 +219,13 @@ public class ControlPanel : EditorWindow
 
     private void OnWalletLoadError(string e) {
         errorString = e;
+    }
+
+    private void AttemptToConnect() {
+        Debug.Log("Attempting to connect...");
+        wallet.LoadWallet(selectedWalletLoad);
+        // Thread.Sleep(10000);
+        Debug.Log("done: " + Thread.CurrentThread.ManagedThreadId);
     }
 
         // GUILayout.Label("Rawrshak Control Panel", EditorStyles.boldLabel);

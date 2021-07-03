@@ -1,0 +1,30 @@
+#rawrshak-label {
+    width: 100%;
+    height: 50px;
+    font-size: 20px;
+    color: white;
+    background-color: rgb(13, 32, 44);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+ToolbarButton {
+    width:20%;
+    height: 20px;
+    -unity-text-align: middle-center;
+}
+
+ToolbarButton:inactive {
+    width:20%;
+    height: 20px;
+    background-color: rgb(60, 60, 60);
+    -unity-text-align: middle-center;
+}
+
+ToolbarButton:selected {
+    width:20%;
+    height: 20px;
+    -unity-font-style: bold;
+    background-color: rgb(90, 90, 90);
+    -unity-text-align: middle-center;
+}

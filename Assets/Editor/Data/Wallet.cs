@@ -21,7 +21,7 @@ public class Wallet : ScriptableObject {
     private UnityEvent onWalletLoad = new UnityEvent();
     private UnityEvent<string> onWalletLoadError = new UnityEvent<string>();
 
-    private WalletConnect walletConnect;
+    public WalletConnect walletConnect;
 
     public void Awake()
     {
@@ -43,7 +43,7 @@ public class Wallet : ScriptableObject {
 
     public void ShowWalletConnectQRCode() {
         // Todo: turn this into a QR code
-        Debug.Log(walletConnect.URI);
+        // Debug.Log(walletConnect.URI);
     }
 
     public void LoadWallet(int selectedWalletLoad) {
