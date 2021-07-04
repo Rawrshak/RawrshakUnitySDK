@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:Box name="settings-content">
+        <engine:Label class="header" text="Rawrshak Settings" />
+        <engine:Label class="header-description" text="Set the Rawrshak connection settings." />
+        
+        <engine:Box name="settings-foldout-box" >
+        
+            <engine:Foldout name="ethereum-settings" text="Ethereum">
+                <engine:TextField name="ethereum-url" label="Ethereum URL" />
+            </engine:Foldout>
+            <engine:Foldout name="graphnode-settings" text="The Graph">
+                <engine:TextField name="graph-node-url" label="Graph Node URL" />
+            </engine:Foldout>
+            
+            <engine:Box name="helpbox-holder" />
+        </engine:Box>
+        
+    </engine:Box>
+</engine:UXML>

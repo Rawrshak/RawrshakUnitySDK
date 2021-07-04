@@ -3,6 +3,7 @@ using UnityEngine;
 // Todo: Serialize and load from json file
 public class Settings : ScriptableObject {
     public string ethereumUrl;
+    public string graphNodeUrl;
 
     public void Awake()
     {
