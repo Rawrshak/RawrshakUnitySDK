@@ -10,13 +10,37 @@
         <engine:Label class="header-description" text="Set the Rawrshak connection settings." />
         
         <engine:Box name="settings-foldout-box" >
+            
+            <engine:Foldout name="Rawrshak-settings" text="Rawrshak">
+                <engine:TextField name="asset-bundle-folder" label="Asset Bundle Folder" binding-path="assetBundleFolder" />
+            </engine:Foldout>
         
             <engine:Foldout name="ethereum-settings" text="Ethereum">
-                <engine:TextField name="ethereum-url" label="Ethereum URL" />
+                <engine:TextField name="ethereum-uri" label="Ethereum URI" binding-path="ethereumGatewayUri" />
+                <editor:EnumField name="network-id" label="Network Id" binding-path="networkId" />
+                <engine:TextField name="chain-id" label="Chain Id" binding-path="chainId" />
+                <engine:TextField name="port" label="Port" binding-path="port" />
+                <engine:TextField name="default-gas-price" label="Default Gas Price" binding-path="defaultGasPrice" />
             </engine:Foldout>
             <engine:Foldout name="graphnode-settings" text="The Graph">
-                <engine:TextField name="graph-node-url" label="Graph Node URL" />
+                <engine:TextField name="graph-node-uri" label="Graph Node URI" binding-path="graphNodeUri" />
             </engine:Foldout>
+            
+            <engine:Foldout name="arweave-settings" text="Arweave">
+                <engine:TextField name="arweave-uri" label="Arweave Gateway URI" binding-path="arweaveGatewayUri" />
+                <engine:TextField name="arweave-wallet-file" label="Wallet File Location" binding-path="arweaveWalletFile" />
+            </engine:Foldout>
+
+            <engine:Button name="save-button" text="Save" />
+
+            <!-- <engine:Foldout name="ipfs-settings" text="IPFS">
+                <engine:TextField name="ipfs-uri" label="IPFS Gateway URI" />
+                <engine:TextField name="ipfs-pinning-api-key" label="Pinning Service Api Key" />
+            </engine:Foldout>
+            <engine:Foldout name="nft-storage-settings" text="NFT Storage">
+                <engine:TextField name="nft-storage-uri" label="NFT Storage URI" />
+                <engine:TextField name="nft-storage-pinning-api-key" label="Pinning Service Api Key" />
+            </engine:Foldout> -->
             
             <engine:Box name="helpbox-holder" />
         </engine:Box>

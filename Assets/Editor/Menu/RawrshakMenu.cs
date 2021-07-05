@@ -42,9 +42,16 @@ public class RawrshakMenu : EditorWindow
         wallet = ScriptableObject.CreateInstance<Wallet>();
         wallet.AddOnWalletLoadListner(OnWalletLoad);
         wallet.AddOnWalletLoadErrorListner(OnWalletLoadError);
-        
-        settings = ScriptableObject.CreateInstance<Settings>();
-        settings.load();
+
+        AssetDatabase.SaveAssets();
+
+        settings = (Settings)AssetDatabase.LoadAssetAtPath("Assets/Editor/Data/RawrshakSettings.asset", typeof(Settings));
+        if (settings == null) {
+            settings = ScriptableObject.CreateInstance<Settings>();
+            settings.InitData();
+            AssetDatabase.CreateAsset(settings, "Assets/Editor/Data/RawrshakSettings.asset");
+            AssetDatabase.SaveAssets();
+        }
     }
 
     private void LoadUXML() {
@@ -77,7 +84,7 @@ public class RawrshakMenu : EditorWindow
 
         LoadContent(selectedButton);
 
-        Debug.Log("Selected Button: " + buttonName);
+        // Debug.Log("Selected Button: " + buttonName);
     }
 
     private void LoadToolbar() {
@@ -178,7 +185,15 @@ public class RawrshakMenu : EditorWindow
     }
 
     private void LoadSettingsPage() {
-        // Todo
+        var mainPage = rootVisualElement.Query<Box>("settings-foldout-box").First();
+
+        SerializedObject so = new SerializedObject(settings);
+        mainPage.Bind(so);
+
+        var saveButton = rootVisualElement.Query<Button>("save-button").First();
+        saveButton.clicked += () => {
+            SaveSettings();
+        };
     }
 
     private void LoadContractPage() {
@@ -213,5 +228,36 @@ public class RawrshakMenu : EditorWindow
         HelpBox helpbox = new HelpBox(e, HelpBoxMessageType.Error);
         helpboxHolder.Clear();
         helpboxHolder.Add(helpbox);
+    }
+
+    private void SaveSettings() {
+        var assetBundleFolder = rootVisualElement.Query<TextField>("asset-bundle-folder").First();
+        settings.assetBundleFolder = assetBundleFolder.text;
+
+        var ethereumUri = rootVisualElement.Query<TextField>("ethereum-uri").First();
+        settings.ethereumGatewayUri = ethereumUri.text;
+
+        var networkId = rootVisualElement.Query<EnumField>("network-id").First();
+        settings.networkId = (Settings.EthereumNetwork)networkId.value;
+
+        var chainId = rootVisualElement.Query<TextField>("chain-id").First();
+        settings.chainId = int.Parse(chainId.text);
+
+        var port = rootVisualElement.Query<TextField>("port").First();
+        settings.port = int.Parse(port.text);
+
+        var defaultGasPrice = rootVisualElement.Query<TextField>("default-gas-price").First();
+        settings.defaultGasPrice = int.Parse(defaultGasPrice.text);
+
+        var graphNodeUri = rootVisualElement.Query<TextField>("graph-node-uri").First();
+        settings.graphNodeUri = graphNodeUri.text;
+
+        var arweaveGatewayUri = rootVisualElement.Query<TextField>("arweave-uri").First();
+        settings.arweaveGatewayUri = arweaveGatewayUri.text;
+
+        var arweaveWalletFile = rootVisualElement.Query<TextField>("arweave-wallet-file").First();
+        settings.arweaveWalletFile = arweaveWalletFile.text;
+
+        AssetDatabase.SaveAssets();
     }
 }
