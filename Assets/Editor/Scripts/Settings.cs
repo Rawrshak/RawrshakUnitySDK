@@ -22,7 +22,7 @@ public class Settings : ScriptableObject {
     public string arweaveGatewayUri;
     public string arweaveWalletFile;
 
-    public void InitData() {
+    public void Init() {
         ethereumGatewayUri = "http://127.0.0.1/";
         networkId = EthereumNetwork.CUSTOM;
         defaultGasPrice = 20;

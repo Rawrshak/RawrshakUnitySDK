@@ -53,3 +53,11 @@ ToolbarButton:selected {
     margin: 5px;
     align-self: center;
 }
+
+#private-key-button-loadout {
+    flex-direction: Row;
+}
+
+.private-key-buttons {
+    flex-grow: 0.5
+}

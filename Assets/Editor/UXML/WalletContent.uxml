@@ -5,24 +5,27 @@
     xmlns:editor="UnityEditor.UIElements"
     xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
 >
-    <engine:Box name="wallet-content">
-        <engine:Label class="header" text="Wallet" />
-        <engine:Label class="header-description" text="Load your game developer wallet. Please select which method to load your wallet." />
+    <engine:Label class="header" text="Wallet" />
+    <engine:Label class="header-description" text="Load your game developer wallet. Please select which method to load your wallet." />
+    
+    <engine:Box name="wallet-foldout-box" >
+        <engine:Foldout name="load-keystore" text="Load Wallet from KeyStore">
+            <engine:TextField name="keystore-location" label="KeyStore Location" />
+            <engine:TextField name="password" label="Password" />
+            <engine:Button name="load-keystore-wallet-button" text="Load Wallet" />
+        </engine:Foldout>
+        <engine:Foldout name="private-key" text="Private Key" value="false" >
+            <engine:TextField name="private-key-field" label="Private Key" />
+            <engine:TextField name="new-password" label="New Password" />
+            <engine:Button name="load-wallet-button" class="private-key-buttons" text="Load Wallet" />
+        </engine:Foldout>
+        <engine:Foldout name="wallet-connect" text="Wallet Connect" value="false" >
+            <engine:Image name="wallet-connect-qrcode" scaleMode="StretchToFill"/>
+            <engine:Button name="connect-wallet-button" text="Connect Wallet" />
+        </engine:Foldout>
         
-        <engine:Box name="wallet-foldout-box" >
-        
-            <engine:Foldout name="private-key" text="Private Key">
-                <engine:TextField name="private-key-field" label="Private Key" />
-                <engine:Button name="load-wallet-button" text="Load Wallet" />
-            </engine:Foldout>
-            <engine:Foldout name="wallet-connect" text="Wallet Connect">
-                <engine:Image name="wallet-connect-qrcode" scaleMode="StretchToFill"/>
-                <engine:Button name="connect-wallet-button" text="Connect Wallet" />
-            </engine:Foldout>
-            
-            <engine:Box name="helpbox-holder" />
-        </engine:Box>
-
-        <engine:Label name="public-key-label" text="Public Key: " />
+        <engine:Box name="helpbox-holder" />
     </engine:Box>
+
+    <engine:Label name="public-key-label" text="Public Key: " />
 </engine:UXML>

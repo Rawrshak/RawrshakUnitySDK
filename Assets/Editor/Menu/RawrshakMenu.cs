@@ -29,7 +29,7 @@ public class RawrshakMenu : EditorWindow
     }
 
     public void OnEnable() {
-        InitData();
+        LoadData();
 
         LoadUXML();
         LoadUSS();
@@ -38,17 +38,27 @@ public class RawrshakMenu : EditorWindow
         LoadContent(selectedButton);
     }
 
-    private void InitData() {
-        wallet = ScriptableObject.CreateInstance<Wallet>();
+    private void LoadData() {
+        // Load Wallet
+        wallet = (Wallet)AssetDatabase.LoadAssetAtPath("Assets/Editor/Data/Wallet.asset", typeof(Settings));
+        if (wallet == null) {
+            wallet = ScriptableObject.CreateInstance<Wallet>();
+            wallet.Init(
+                "Rawrshak Unity SDK Connection",
+                "https://app.warriders.com/favicon.ico",
+                "Rawrshak Unity SDK",
+                "https://app.warriders.com");
+            AssetDatabase.CreateAsset(wallet, "Assets/Editor/Data/Wallet.asset");
+            AssetDatabase.SaveAssets();
+        }
         wallet.AddOnWalletLoadListner(OnWalletLoad);
         wallet.AddOnWalletLoadErrorListner(OnWalletLoadError);
 
-        AssetDatabase.SaveAssets();
-
+        // Load Settings
         settings = (Settings)AssetDatabase.LoadAssetAtPath("Assets/Editor/Data/RawrshakSettings.asset", typeof(Settings));
         if (settings == null) {
             settings = ScriptableObject.CreateInstance<Settings>();
-            settings.InitData();
+            settings.Init();
             AssetDatabase.CreateAsset(settings, "Assets/Editor/Data/RawrshakSettings.asset");
             AssetDatabase.SaveAssets();
         }
@@ -72,6 +82,9 @@ public class RawrshakMenu : EditorWindow
     }
 
     private void OnClick(string buttonName) {
+        // Save Scriptable Objects first
+        AssetDatabase.SaveAssets();
+
         var tabs = rootVisualElement.Query<ToolbarButton>().ToList();
         foreach (ToolbarButton tab in tabs) {
             tab.style.backgroundColor = unselectedBGColor;
@@ -164,19 +177,50 @@ public class RawrshakMenu : EditorWindow
         var privateKeyTextField = rootVisualElement.Query<TextField>("private-key-field").First();
         var qrCode = rootVisualElement.Query<Image>("wallet-connect-qrcode").First();
         var walletConnectButton = rootVisualElement.Query<Button>("connect-wallet-button").First();
+        var keystoreLocation = rootVisualElement.Query<TextField>("keystore-location").First();
+        var password = rootVisualElement.Query<TextField>("password").First();
+        var newPassword = rootVisualElement.Query<TextField>("new-password").First();
+        var keystoreLoadButton = rootVisualElement.Query<Button>("load-keystore-wallet-button").First();
 
         // Reset public key
-        publicKeyLabel.text = String.Format("Wallet Address: {0}", wallet.getPublicKey());
+        publicKeyLabel.text = String.Format("Wallet Address: {0}", wallet.publicKey);
 
-        // Set up Load Wallet Button
-        loadWalletButton.clicked += () => {
-            var privateKey = privateKeyTextField.value;
-            privateKeyTextField.value = "";
-            wallet.LoadWalletFromPrivateKey(privateKey);
+        // Set Password field settings
+        password.isPasswordField = true;
+        password.maskChar = '*';
+        newPassword.isPasswordField = true;
+        newPassword.maskChar = '*';
+        
+        // Load Keystore 
+        keystoreLocation.value = wallet.keyStoreLocation;
+        keystoreLoadButton.clicked += () => {
+            if (password.value == "" || keystoreLocation.value == "") {
+                Debug.Log("shit is null");
+                OnWalletLoadError("Error: Empty Keystore location or password.");
+                return;
+            }
+            var pword = password.value;
+            password.value = "";
+            if (keystoreLocation.value != wallet.keyStoreLocation) {
+                wallet.keyStoreLocation = keystoreLocation.value;
+            }
+            wallet.LoadWalletFromKeyStore(pword);
         };
 
-        qrCode.image = wallet.qrCodeTexture;
+        // Set up Load Wallet and Save to file Button
+        loadWalletButton.clicked += () => {
+            if (newPassword.value == "") {
+                OnWalletLoadError("Error: Password cannot be empty.");
+                return;
+            }
+            wallet.LoadWalletFromPrivateKey(privateKeyTextField.value);
+            wallet.SaveWalletToFile(newPassword.value);
+            privateKeyTextField.value = "";
+            newPassword.value = "";
+        };
 
+        // Set up Wallet Connect
+        qrCode.image = wallet.qrCodeTexture;
         walletConnectButton.clicked += async () => {
             Debug.Log("Waiting for WalletConnect...");
             await wallet.LoadWalletFromWalletConnect();
@@ -192,6 +236,7 @@ public class RawrshakMenu : EditorWindow
 
         var saveButton = rootVisualElement.Query<Button>("save-button").First();
         saveButton.clicked += () => {
+            VerifySettings();
             SaveSettings();
         };
     }
@@ -215,7 +260,7 @@ public class RawrshakMenu : EditorWindow
 
         // Update Wallet
         var publicKeyLabel = rootVisualElement.Query<Label>("public-key-label").First();
-        publicKeyLabel.text = String.Format("Wallet Address: {0}", wallet.getPublicKey());
+        publicKeyLabel.text = String.Format("Wallet Address: {0}", wallet.publicKey);
         Debug.Log("Wallet Loaded!");
 
         // Refresh UI
@@ -259,5 +304,12 @@ public class RawrshakMenu : EditorWindow
         settings.arweaveWalletFile = arweaveWalletFile.text;
 
         AssetDatabase.SaveAssets();
+    }
+
+    private void VerifySettings() {
+        // Check if asset bundle folder exists
+        // Check if we can connect to ethereum 
+        // check if we can connect to arweave
+        // check if we can connect to the graph node
     }
 }
