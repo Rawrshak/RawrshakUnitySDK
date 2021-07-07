@@ -5,8 +5,12 @@
     xmlns:editor="UnityEditor.UIElements"
     xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
 >
-    <engine:Box name="asset-bundle-content">
-        <engine:Label name="asset-bundle-text" text="Asset Bundle Page!" />
-    </engine:Box>
+    <engine:Label class="header" text="Asset Bundles" />
+    <engine:Label class="header-description" text="Manage and upload asset bundles to Permanent Cloud Storage." />
+
+    <engine:Button name="create-asset-bundles-button" text="Generate Asset Bundles" />
+    <engine:Button name="print-button" text="Print Asset Bundles" />
+
+    <engine:Box name="helpbox-holder" />
     
 </engine:UXML>

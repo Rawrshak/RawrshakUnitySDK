@@ -31,10 +31,10 @@ public class Wallet : ScriptableObject {
     private string password;
 
     // Client Metadata information
-    string wcDescription;
-    string wcIconUri;
-    string wcName;
-    string wcUrl;
+    public string wcDescription;
+    public string wcIconUri;
+    public string wcName;
+    public string wcUrl;
     
     // WalletConnect Info
     public Texture2D qrCodeTexture;
@@ -58,7 +58,7 @@ public class Wallet : ScriptableObject {
         wcUrl = url;
 
         connectionType = ConnectionType.None;
-        keyStoreLocation = "Assets/Editor/Data/Keystore/WalletKeyStore.json";
+        keyStoreLocation = "Assets/Editor/Resources/Keystore/WalletKeyStore.json";
     }
 
     public void Awake()
@@ -151,7 +151,7 @@ public class Wallet : ScriptableObject {
             var keyStore = keyStoreService.EncryptAndGenerateKeyStore(newPassword, account.PrivateKey.HexToByteArray(), account.Address, scryptParams);
             var json = keyStoreService.SerializeKeyStoreToJson(keyStore);
 
-            // Delete file first
+            // Delete file and .meta filefirst
             File.Delete(keyStoreLocation);
             File.Delete(keyStoreLocation + ".meta");
             AssetDatabase.Refresh();
@@ -161,7 +161,7 @@ public class Wallet : ScriptableObject {
             writer.WriteLine(json);
             writer.Close();
 
-            // keyStoreLocation = json;
+            // save password
             password = newPassword;
         } catch (Exception ex) {
             Debug.LogError(ex.Message);

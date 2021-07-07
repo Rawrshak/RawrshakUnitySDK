@@ -1,11 +1,18 @@
 using UnityEngine;
 
-namespace Types {
-    public enum MenuType {
-        WALLET,
-        SETTINGS,
-        CONTENTVIEW,
-        ASSETLIST,
-        ASSETBUNDLE
-    }
+namespace Rawrshak {
+
+    public enum EthereumNetwork {
+        Mainnet,
+        Rinkby,
+        Kovan,
+        Localhost
+    };
+    public enum SupportedBuildTargets {
+        StandaloneWindows,
+        StandaloneWindows64,
+        Android,
+        iOS,
+        WebGL
+    };
 }

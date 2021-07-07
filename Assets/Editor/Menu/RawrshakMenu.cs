@@ -20,6 +20,7 @@ public class RawrshakMenu : EditorWindow
     string selectedButton = "wallet-button";
     private static Wallet wallet; 
     private static Settings settings;
+    private static AssetBundleManager assetBundleManager;
 
     [MenuItem("Rawrshak/Rawrshak Menu")]
     public static void ShowExample()
@@ -38,9 +39,14 @@ public class RawrshakMenu : EditorWindow
         LoadContent(selectedButton);
     }
 
+    public void OnDisable() {
+        assetBundleManager.CleanUp();
+        Debug.Log("Menu Disalbed.");
+    }
+
     private void LoadData() {
         // Load Wallet
-        wallet = (Wallet)AssetDatabase.LoadAssetAtPath("Assets/Editor/Data/Wallet.asset", typeof(Settings));
+        wallet = Resources.Load<Wallet>("Wallet");
         if (wallet == null) {
             wallet = ScriptableObject.CreateInstance<Wallet>();
             wallet.Init(
@@ -48,20 +54,23 @@ public class RawrshakMenu : EditorWindow
                 "https://app.warriders.com/favicon.ico",
                 "Rawrshak Unity SDK",
                 "https://app.warriders.com");
-            AssetDatabase.CreateAsset(wallet, "Assets/Editor/Data/Wallet.asset");
+            AssetDatabase.CreateAsset(wallet, "Assets/Editor/Resources/Wallet.asset");
             AssetDatabase.SaveAssets();
         }
         wallet.AddOnWalletLoadListner(OnWalletLoad);
         wallet.AddOnWalletLoadErrorListner(OnWalletLoadError);
 
         // Load Settings
-        settings = (Settings)AssetDatabase.LoadAssetAtPath("Assets/Editor/Data/RawrshakSettings.asset", typeof(Settings));
+        settings = Resources.Load<Settings>("RawrshakSettings");
         if (settings == null) {
             settings = ScriptableObject.CreateInstance<Settings>();
             settings.Init();
-            AssetDatabase.CreateAsset(settings, "Assets/Editor/Data/RawrshakSettings.asset");
+            AssetDatabase.CreateAsset(settings, "Assets/Editor/Resources/RawrshakSettings.asset");
             AssetDatabase.SaveAssets();
         }
+
+        assetBundleManager = ScriptableObject.CreateInstance<AssetBundleManager>();
+        assetBundleManager.Init(Application.dataPath + "/" + settings.assetBundleFolder + "AssetBundles");
     }
 
     private void LoadUXML() {
@@ -250,7 +259,21 @@ public class RawrshakMenu : EditorWindow
     }
 
     private void LoadAssetBundlePage() {
-        // Todo
+        var helpboxHolder = rootVisualElement.Query<Box>("helpbox-holder").First();
+
+        var generateAssetBundles = rootVisualElement.Query<Button>("create-asset-bundles-button").First();
+        generateAssetBundles.clicked += () => {
+            CreateAssetBundles.BuildAllAssetBundles(settings.buildTarget);
+        };
+
+        var printButton = rootVisualElement.Query<Button>("print-button").First();
+        printButton.clicked += () => {
+            var bundleNames = assetBundleManager.GetAllAssetBundleNames();
+            foreach(string name in bundleNames)
+            {
+                Debug.Log("AssetBundle: " + name);
+            }
+        };
     }
 
     private void OnWalletLoad() {
@@ -279,11 +302,14 @@ public class RawrshakMenu : EditorWindow
         var assetBundleFolder = rootVisualElement.Query<TextField>("asset-bundle-folder").First();
         settings.assetBundleFolder = assetBundleFolder.text;
 
+        var buildTarget = rootVisualElement.Query<EnumField>("build-target").First();
+        settings.buildTarget = (Rawrshak.SupportedBuildTargets)buildTarget.value;
+
         var ethereumUri = rootVisualElement.Query<TextField>("ethereum-uri").First();
         settings.ethereumGatewayUri = ethereumUri.text;
 
         var networkId = rootVisualElement.Query<EnumField>("network-id").First();
-        settings.networkId = (Settings.EthereumNetwork)networkId.value;
+        settings.networkId = (Rawrshak.EthereumNetwork)networkId.value;
 
         var chainId = rootVisualElement.Query<TextField>("chain-id").First();
         settings.chainId = int.Parse(chainId.text);
