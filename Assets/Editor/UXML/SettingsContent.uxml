@@ -10,12 +10,12 @@
     
     <engine:Box name="settings-foldout-box" >
         
-        <engine:Foldout name="Rawrshak-settings" text="Rawrshak">
+        <engine:Foldout class="foldout-style" name="Rawrshak-settings" text="Rawrshak">
             <engine:TextField name="asset-bundle-folder" label="Asset Bundle Folder" binding-path="assetBundleFolder" />
             <editor:EnumField name="build-target" label="Build Target" binding-path="buildTarget" />
         </engine:Foldout>
     
-        <engine:Foldout name="ethereum-settings" text="Ethereum">
+        <engine:Foldout class="foldout-style" name="ethereum-settings" text="Ethereum">
             <engine:TextField name="ethereum-uri" label="Ethereum URI" binding-path="ethereumGatewayUri" />
             <editor:EnumField name="network-id" label="Network Id" binding-path="networkId" />
             <engine:TextField name="chain-id" label="Chain Id" binding-path="chainId" />
@@ -23,11 +23,11 @@
             <engine:TextField name="default-gas-price" label="Default Gas Price" binding-path="defaultGasPrice" />
             <engine:Toggle name="ask-for-password" label="Require Password for every Transaction" binding-path="askForPasswordAtEveryTransaction" />
         </engine:Foldout>
-        <engine:Foldout name="graphnode-settings" text="The Graph">
+        <engine:Foldout class="foldout-style" name="graphnode-settings" text="The Graph">
             <engine:TextField name="graph-node-uri" label="Graph Node URI" binding-path="graphNodeUri" />
         </engine:Foldout>
         
-        <engine:Foldout name="arweave-settings" text="Arweave">
+        <engine:Foldout class="foldout-style" name="arweave-settings" text="Arweave">
             <engine:TextField name="arweave-uri" label="Arweave Gateway URI" binding-path="arweaveGatewayUri" />
             <engine:TextField name="arweave-wallet-file" label="Wallet File Location" binding-path="arweaveWalletFile" />
         </engine:Foldout>

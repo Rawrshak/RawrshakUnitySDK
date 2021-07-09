@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:Box name="asset-bundle-box" style="flex-direction: Row; font-size: 12px;" >
+        <engine:Label name="asset-bundle-name" text="Bundle Name" style="width: 30%;"/>
+        <engine:Label name="asset-bundle-hash" text="Hash Id" style="width: 50%;"/>
+        <engine:Toggle name="asset-bundle-selected" value="false" style="width: 20%;"/>
+    </engine:Box> 
+    
+</engine:UXML>

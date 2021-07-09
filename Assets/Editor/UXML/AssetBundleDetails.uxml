@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:Label text="Asset Bundle Info" style="font-size: 14px;" />
+    <engine:Box style="font-size: 12px;" >
+        <engine:TextField name="name" label="Name" enabledSelf="false" />
+        <engine:TextField name="hash" label="Hash Id" enabledSelf="false" />
+        <engine:TextField name="transaction-id" label="Transaction Id" enabledSelf="false" />
+        <engine:TextField name="uri" label="Uri" enabledSelf="false" />
+        <engine:TextField name="uploaded-timestamp" label="Upload Timestamp" enabledSelf="false" />
+    </engine:Box> 
+    
+</engine:UXML>

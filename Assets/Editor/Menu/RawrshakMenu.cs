@@ -70,7 +70,7 @@ public class RawrshakMenu : EditorWindow
         }
 
         assetBundleManager = ScriptableObject.CreateInstance<AssetBundleManager>();
-        assetBundleManager.Init(Application.dataPath + "/" + settings.assetBundleFolder + "AssetBundles");
+        assetBundleManager.Init(Application.dataPath + "/" + settings.assetBundleFolder);
     }
 
     private void LoadUXML() {
@@ -90,7 +90,7 @@ public class RawrshakMenu : EditorWindow
         rootVisualElement.styleSheets.Add(styleSheet);
     }
 
-    private void OnClick(string buttonName) {
+    private void OnClickToolbarButton(string buttonName) {
         // Save Scriptable Objects first
         AssetDatabase.SaveAssets();
 
@@ -114,7 +114,7 @@ public class RawrshakMenu : EditorWindow
         var tabs = rootVisualElement.Query<ToolbarButton>().ToList();
         foreach (ToolbarButton tab in tabs) {
             tab.clicked += () => {
-                OnClick(tab.name);
+                OnClickToolbarButton(tab.name);
             };
             tab.style.backgroundColor = unselectedBGColor;
         }
@@ -266,14 +266,27 @@ public class RawrshakMenu : EditorWindow
             CreateAssetBundles.BuildAllAssetBundles(settings.buildTarget);
         };
 
-        var printButton = rootVisualElement.Query<Button>("print-button").First();
-        printButton.clicked += () => {
-            var bundleNames = assetBundleManager.GetAllAssetBundleNames();
-            foreach(string name in bundleNames)
-            {
-                Debug.Log("AssetBundle: " + name);
-            }
+        assetBundleManager.assetBundleEntries = rootVisualElement.Query<Box>("asset-bundle-entries").First();
+        assetBundleManager.uploadedAsssetBundleEntries = rootVisualElement.Query<Box>("uploaded-asset-bundle-entries").First();
+        assetBundleManager.assetBundleInfoBox = rootVisualElement.Query<Box>("asset-bundle-info").First();
+
+        // var printButton = rootVisualElement.Query<Button>("print-button").First();
+        // printButton.clicked += () => {
+        //     assetBundleManager.Refresh();
+        // };
+        
+        var uploadButton = rootVisualElement.Query<Button>("upload-button").First();
+        uploadButton.clicked += () => {
+            assetBundleManager.UploadAssetBundles();
+
+            // Update UI
+            assetBundleManager.Refresh();
+            assetBundleManager.RefreshUploadedAssetBundlesBox();
         };
+
+        // Refresh some UI
+        assetBundleManager.Refresh();
+        assetBundleManager.RefreshUploadedAssetBundlesBox();
     }
 
     private void OnWalletLoad() {

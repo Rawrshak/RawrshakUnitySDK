@@ -154,12 +154,12 @@ public class Wallet : ScriptableObject {
             // Delete file and .meta filefirst
             File.Delete(keyStoreLocation);
             File.Delete(keyStoreLocation + ".meta");
-            AssetDatabase.Refresh();
 
             // write file 
             StreamWriter writer = new StreamWriter(keyStoreLocation, true);
             writer.WriteLine(json);
             writer.Close();
+            AssetDatabase.Refresh();
 
             // save password
             password = newPassword;

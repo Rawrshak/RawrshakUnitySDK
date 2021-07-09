@@ -61,3 +61,13 @@ ToolbarButton:selected {
 .private-key-buttons {
     flex-grow: 0.5
 }
+
+.section-header {
+    font-size: 12px;
+    -unity-font-style: bold;
+}
+
+.foldout-style {
+    font-size: 14px; 
+    margin: 5px 0px;
+}
