@@ -7,29 +7,31 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 
-[Serializable]
 public class ContentContractManager : ScriptableObject
 {
-    [NonSerialized]
     public Settings mSettings;
-    [NonSerialized]
     public Wallet mWallet;
-    [NonSerialized]
     public Box mContractEntriesBox;
-    [NonSerialized]
     public Box mContentContractInfoBox;
-    [NonSerialized]
     public Label mWalletLabel;
-    [NonSerialized]
-    public Button mGenerateContractButon;
+    public Button mGenerateContractButton;
+    public ContentContract mSelected;
+
+    // Private UXML
+    VisualTreeAsset mContractInfoAsset;
+    VisualTreeAsset mContractListEntry;
+
+    // Static Variables
+    static string sContentContractFileLocation = "Assets/Editor/Resources/ContentContracts/";
 
     // Data
-    public List<ContentContract> mContentContracts;
+    private List<ContentContract> mContentContracts;
 
     public void Init(Wallet wallet, Settings settings)
     {
         mSettings = settings;
         mWallet = wallet;
+        mSelected = null;
 
         if (mContentContracts == null) {
             mContentContracts = new List<ContentContract>();
@@ -38,28 +40,26 @@ public class ContentContractManager : ScriptableObject
         // Load all Content Contracts in Resources/ContentContracts
         foreach (ContentContract contract in Resources.FindObjectsOfTypeAll(typeof(ContentContract)) as ContentContract[])
         {
+            // Only Load contracts that are stored
             if (EditorUtility.IsPersistent(contract))
             {
                 mContentContracts.Add(contract);
                 Debug.Log("Adding Content Contract: " + contract.mName + ", ID: " + contract.GetInstanceID());
             }
         }
+
+        LoadUXML();
+    }
+
+    private void LoadUXML()
+    {
+        mContractInfoAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/ContentContractInfo.uxml");
+        mContractListEntry = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/ContentContractEntry.uxml");
     }
 
     public void CleanUp()
-    {        
-        // string data = this.SaveToJSON();
-        // Debug.Log("Saving Unpublished Content Contracts.");
-        
-        // // Delete file and .meta filefirst
-        // File.Delete("Assets/Editor/Resources/ContentContractInfo.json");
-        // File.Delete("Assets/Editor/Resources/ContentContractInfo.json.meta");
-        
-        // // write file 
-        // StreamWriter writer = new StreamWriter("Assets/Editor/Resources/ContentContractInfo.json", true);
-        // writer.WriteLine(data);
-        // writer.Close();
-        // AssetDatabase.Refresh();
+    {
+        // This saves all the content contracts that have not yet been uploaded.
         AssetDatabase.SaveAssets();
     }
 
@@ -67,11 +67,12 @@ public class ContentContractManager : ScriptableObject
     {
         mWalletLabel.text = "Current Wallet Loaded: " + mWallet.publicKey;
 
-        mGenerateContractButon.clicked += () => {
+        mGenerateContractButton.clicked += () => {
             GenerateContract();
         };
 
         RefreshContractList();
+        LoadContractInfo(mSelected);
     }
 
     private void GenerateContract()
@@ -90,53 +91,53 @@ public class ContentContractManager : ScriptableObject
 
     private void LoadContractInfo(ContentContract contract)
     {
-        if (mContentContractInfoBox == null)
+        if (contract == null)
         {
-            // Todo: Throw error or update helpbox
             return;
         }
-
+        
         mContentContractInfoBox.Clear();
         
-        Debug.Log("Generating Contract Info ");
-        var content = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/ContentContractInfo.uxml");
-        TemplateContainer contentTree = content.CloneTree();
+        TemplateContainer assetTree = mContractInfoAsset.CloneTree();
 
-        var infoSection = contentTree.contentContainer.Query<Box>("content-contract-info-section").First();
-        
+        var infoSection = assetTree.contentContainer.Query<Box>("content-contract-info-section").First();
         SerializedObject so = new SerializedObject(contract);
         infoSection.Bind(so);
         
-        mContentContractInfoBox.Add(contentTree);
+        // Add this to info box
+        mContentContractInfoBox.Add(assetTree);
+
+        mSelected = contract;
+        Debug.Log("Selected Content Contract: " + contract.mName);
     }
 
     private void RefreshContractList()
     {
         mContractEntriesBox.Clear();
-        var content = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/ContentContractEntry.uxml");
+
         foreach (var contract in mContentContracts)
         {
-            TemplateContainer contentTree = content.CloneTree();
+            TemplateContainer assetTree = mContractListEntry.CloneTree();
             
-            var entry = contentTree.contentContainer.Query<Box>("content-contract-box").First();
+            var entry = assetTree.contentContainer.Query<Box>("content-contract-box").First();
             SerializedObject so = new SerializedObject(contract);
             entry.Bind(so);
 
-            var deployBox = contentTree.contentContainer.Query<Box>("deploy-box").First();
-            var preDeployBox = contentTree.contentContainer.Query<Box>("pre-deploy-box").First();
-            var postDeployBox = contentTree.contentContainer.Query<Box>("post-deploy-box").First();
+            var deployBox = assetTree.contentContainer.Query<Box>("deploy-box").First();
+            var preDeployBox = assetTree.contentContainer.Query<Box>("pre-deploy-box").First();
+            var postDeployBox = assetTree.contentContainer.Query<Box>("post-deploy-box").First();
             if (contract.isDeployed)
             {
                 deployBox.contentContainer.Remove(preDeployBox);
                 
-                var uploadDateLabel = contentTree.contentContainer.Query<Label>("upload-date-label").First();
+                var uploadDateLabel = assetTree.contentContainer.Query<Label>("upload-date-label").First();
                 uploadDateLabel.text = contract.mContractDeploymentDate;
             }
             else
             {
                 deployBox.contentContainer.Remove(postDeployBox);
-                var deployButton = contentTree.contentContainer.Query<Button>("deploy-button").First();
-                var deleteButton = contentTree.contentContainer.Query<Button>("delete-button").First();
+                var deployButton = assetTree.contentContainer.Query<Button>("deploy-button").First();
+                var deleteButton = assetTree.contentContainer.Query<Button>("delete-button").First();
 
                 deployButton.clicked += () => {
                     // Debug.Log("Contract Name: " + contract.mName);
@@ -150,7 +151,7 @@ public class ContentContractManager : ScriptableObject
                     Debug.Log("Delete Name: " + contract.name);
 
                     // Delete file and .meta filefirst
-                    string fileName = String.Format("Assets/Editor/Resources/ContentContracts/{0}.asset", contract.name);
+                    string fileName = String.Format("{0}/{1}.asset", sContentContractFileLocation, contract.name);
                     File.Delete(fileName);
                     File.Delete(fileName + ".meta");
                     AssetDatabase.Refresh();
@@ -165,18 +166,17 @@ public class ContentContractManager : ScriptableObject
 
             // Select Content Contract Callback
             entry.RegisterCallback<MouseDownEvent>((evt) => {
-                // assetBundleData.selected = (evt.target as Label).value;
                 Debug.Log("Info to Display: " + contract.mName);
                 LoadContractInfo(contract);
             });
 
-            mContractEntriesBox.Add(contentTree);
+            mContractEntriesBox.Add(assetTree);
         }
     }
 
     private void CreateContentContractFile(ContentContract contract)
     {
-        string fileName = String.Format("Assets/Editor/Resources/ContentContracts/Contract_{0}.asset", contract.GetInstanceID());
+        string fileName = String.Format("{0}/Contract_{1}.asset", sContentContractFileLocation, contract.GetInstanceID());
         AssetDatabase.CreateAsset(contract, fileName);
         AssetDatabase.SaveAssets();
     }
