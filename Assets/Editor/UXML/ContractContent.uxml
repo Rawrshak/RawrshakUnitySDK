@@ -5,7 +5,29 @@
     xmlns:editor="UnityEditor.UIElements"
     xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
 >
-    <engine:Box name="contract-content">
-        <engine:Label name="contract-text" text="Contract Page!" />
-    </engine:Box>
+    <engine:Label class="header" text="Content Contracts" />
+    <engine:Label class="header-description" text="Manage and deploy your Content Contracts" />
+
+    <engine:Label name="wallet-label" text="Current Wallet Loaded: " style="font-size: 14px; margin: 5px 0px;" />
+
+    <engine:Button name="generate-content-contract-button" text="Generate Content Contract" />
+    
+    <engine:Foldout class="foldout-style" name="contracts-section" text="Content Contracts">
+        <engine:ScrollView >
+            <engine:Box style="flex-direction: Row;" >
+                <engine:Label text="Name" style="width: 30%; font-size: 14px;"  />
+                <engine:Label text="Symbol" style="width: 30%; font-size: 14px;" />
+                <engine:Label text="Deploy" style="width: 40%; font-size: 14px;" />
+            </engine:Box> 
+
+            <engine:Box name="contract-entries" />
+            <!-- <engine:Button name="deploy-button" text="Deploy to Ethereum" /> -->
+        </engine:ScrollView>        
+    </engine:Foldout>
+
+    <engine:Box >
+        <engine:Label text="Content Contract Info" style="font-size: 14px;" />
+        <engine:Box name="content-contract-info" style="font-size: 14px; margin: 5px;" />
+    </engine:Box> 
+
 </engine:UXML>

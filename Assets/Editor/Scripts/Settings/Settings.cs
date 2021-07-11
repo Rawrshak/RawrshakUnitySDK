@@ -4,8 +4,9 @@ using Rawrshak;
 
 // Todo: Serialize and load from json file
 [CreateAssetMenu(fileName = "RawrshakSettings", menuName = "ScriptableObjects/RawrshakSettings", order = 1)]
-public class Settings : ScriptableObject {
-
+public class Settings : ScriptableObject
+{
+    public string developerName;
     public string assetBundleFolder;
     public SupportedBuildTargets buildTarget;
     public string graphNodeUri;
@@ -19,6 +20,7 @@ public class Settings : ScriptableObject {
     public string arweaveWalletFile;
 
     public void Init() {
+        developerName = "";
         ethereumGatewayUri = "http://localhost";
         networkId = EthereumNetwork.Localhost;
         defaultGasPrice = 20;

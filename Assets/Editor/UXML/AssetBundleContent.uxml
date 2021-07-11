@@ -38,7 +38,10 @@
         </engine:ScrollView>
     </engine:Foldout>
 
-    <engine:Box name="asset-bundle-info" style="font-size: 14px; margin: 5px;" />
+    <engine:Box >
+        <engine:Label text="Asset Bundle Info" style="font-size: 14px;" />
+        <engine:Box name="asset-bundle-info" style="font-size: 14px; margin: 5px;" />
+    </engine:Box> 
 
     <engine:Box name="helpbox-holder" />
     

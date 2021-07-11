@@ -10,6 +10,10 @@
     
     <engine:Box name="settings-foldout-box" >
         
+        <engine:Foldout class="foldout-style" name="developer-settings" text="Developer">
+            <engine:TextField name="developer-name" label="Developer Name" binding-path="developerName" />
+        </engine:Foldout>
+
         <engine:Foldout class="foldout-style" name="Rawrshak-settings" text="Rawrshak">
             <engine:TextField name="asset-bundle-folder" label="Asset Bundle Folder" binding-path="assetBundleFolder" />
             <editor:EnumField name="build-target" label="Build Target" binding-path="buildTarget" />

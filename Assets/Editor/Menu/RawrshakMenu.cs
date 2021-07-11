@@ -21,6 +21,7 @@ public class RawrshakMenu : EditorWindow
     private static Wallet wallet; 
     private static Settings settings;
     private static AssetBundleManager assetBundleManager;
+    private static ContentContractManager contentContractManager;
 
     [MenuItem("Rawrshak/Rawrshak Menu")]
     public static void ShowExample()
@@ -41,6 +42,8 @@ public class RawrshakMenu : EditorWindow
 
     public void OnDisable() {
         assetBundleManager.CleanUp();
+        contentContractManager.CleanUp();
+        AssetDatabase.SaveAssets();
         Debug.Log("Menu Disalbed.");
     }
 
@@ -71,6 +74,9 @@ public class RawrshakMenu : EditorWindow
 
         assetBundleManager = ScriptableObject.CreateInstance<AssetBundleManager>();
         assetBundleManager.Init(Application.dataPath + "/" + settings.assetBundleFolder);
+
+        contentContractManager = ScriptableObject.CreateInstance<ContentContractManager>();
+        contentContractManager.Init(wallet, settings);
     }
 
     private void LoadUXML() {
@@ -251,7 +257,14 @@ public class RawrshakMenu : EditorWindow
     }
 
     private void LoadContractPage() {
-        // Todo
+        var helpboxHolder = rootVisualElement.Query<Box>("helpbox-holder").First();
+
+        contentContractManager.mContractEntriesBox = rootVisualElement.Query<Box>("contract-entries").First();
+        contentContractManager.mContentContractInfoBox = rootVisualElement.Query<Box>("content-contract-info").First();
+        contentContractManager.mWalletLabel = rootVisualElement.Query<Label>("wallet-label").First();
+        contentContractManager.mGenerateContractButon = rootVisualElement.Query<Button>("generate-content-contract-button").First();
+
+        contentContractManager.LoadContentContractUI();
     }
 
     private void LoadAssetPage() {
@@ -312,6 +325,9 @@ public class RawrshakMenu : EditorWindow
     }
 
     private void SaveSettings() {
+        var developerName = rootVisualElement.Query<TextField>("developer-name").First();
+        settings.developerName = developerName.text;
+
         var assetBundleFolder = rootVisualElement.Query<TextField>("asset-bundle-folder").First();
         settings.assetBundleFolder = assetBundleFolder.text;
 

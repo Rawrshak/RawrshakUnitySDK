@@ -15,4 +15,12 @@ namespace Rawrshak {
         iOS,
         WebGL
     };
+
+    // [Flags]
+    public enum Role
+    {
+        None = 0,
+        Minter = 1 << 0,
+        Burner = 1 << 1
+    };
 }
