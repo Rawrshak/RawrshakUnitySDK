@@ -5,8 +5,32 @@
     xmlns:editor="UnityEditor.UIElements"
     xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
 >
-    <engine:Box name="asset-content">
-        <engine:Label name="asset-text" text="Asset Page!" />
-    </engine:Box>
-    
+>
+    <engine:Label class="header" text="Assets" />
+    <engine:Label class="header-description" text="Manage and deploy Assets onto your Content Contract" />
+
+    <engine:Box style="font-size: 14px; margin: 5px 0px;" >
+        <engine:Label name="wallet-label" text="Current Wallet Loaded: "  />
+        <engine:Label name="content-label" text="Current Content Contract Selected: " style="font-size: 14px; margin: 5px 0px;" />
+    </engine:Box >
+
+    <engine:Button name="generate-asset-button" text="Generate New Asset" />
+
+    <engine:Foldout class="foldout-style" name="asset-list-section" text="Assets">
+        <engine:ScrollView >
+            <engine:Box style="flex-direction: Row;" >
+                <engine:Label text="Name" style="width: 70%; font-size: 14px;"  />
+                <engine:Label text="Deploy" style="width: 30%; font-size: 14px;" />
+            </engine:Box> 
+
+            <engine:Box name="asset-entries" />
+        </engine:ScrollView>        
+    </engine:Foldout>
+
+    <engine:Box >
+        <engine:Label text="Asset Info" style="font-size: 14px;" />
+        <engine:Box name="asset-info" style="font-size: 14px; margin: 5px;" />
+    </engine:Box> 
+
+    <engine:Box name="helpbox-holder" />
 </engine:UXML>

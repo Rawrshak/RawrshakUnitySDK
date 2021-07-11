@@ -22,6 +22,7 @@ public class RawrshakMenu : EditorWindow
     private static Settings settings;
     private static AssetBundleManager assetBundleManager;
     private static ContentContractManager contentContractManager;
+    private static AssetsManager assetsManager;
 
     [MenuItem("Rawrshak/Rawrshak Menu")]
     public static void ShowExample()
@@ -77,6 +78,9 @@ public class RawrshakMenu : EditorWindow
 
         contentContractManager = ScriptableObject.CreateInstance<ContentContractManager>();
         contentContractManager.Init(wallet, settings);
+        
+        assetsManager = ScriptableObject.CreateInstance<AssetsManager>();
+        assetsManager.Init(wallet, contentContractManager);
     }
 
     private void LoadUXML() {
@@ -262,13 +266,21 @@ public class RawrshakMenu : EditorWindow
         contentContractManager.mContractEntriesBox = rootVisualElement.Query<Box>("contract-entries").First();
         contentContractManager.mContentContractInfoBox = rootVisualElement.Query<Box>("content-contract-info").First();
         contentContractManager.mWalletLabel = rootVisualElement.Query<Label>("wallet-label").First();
-        contentContractManager.mGenerateContractButon = rootVisualElement.Query<Button>("generate-content-contract-button").First();
+        contentContractManager.mGenerateContractButton = rootVisualElement.Query<Button>("generate-content-contract-button").First();
 
         contentContractManager.LoadContentContractUI();
     }
 
     private void LoadAssetPage() {
-        // Todo
+        assetsManager.mHelpBoxHolder = rootVisualElement.Query<Box>("helpbox-holder").First();
+
+        assetsManager.mAssetListBox = rootVisualElement.Query<Box>("asset-entries").First();
+        assetsManager.mAssetInfoBox = rootVisualElement.Query<Box>("asset-info").First();
+        assetsManager.mWalletLabel = rootVisualElement.Query<Label>("wallet-label").First();
+        assetsManager.mContentContractLabel = rootVisualElement.Query<Label>("content-label").First();
+        assetsManager.mGenerateAssetButton = rootVisualElement.Query<Button>("generate-asset-button").First();
+
+        assetsManager.LoadAssetsUI();
     }
 
     private void LoadAssetBundlePage() {
