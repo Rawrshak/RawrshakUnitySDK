@@ -11,14 +11,20 @@ public class AssetData : ScriptableObject
     public int mId;
     public string mMetadataUri;
     public string mHiddenMetadataUri;
+    public string mAssetDeploymentDate;
+    public bool mIsDeployed;
+    public bool mSelectedForUploading;
     public List<ContractRoyalties> mContractRoyalties;
 
-    public void Init(string developerName, string developerAddress)
+    public void Init()
     {
-        mName = "Content Contract Name";
+        mName = "Asset Name";
         mId = 0; // Todo: randomly generate this id
         mMetadataUri = "...";
         mHiddenMetadataUri = "...";
+        mSelectedForUploading = false;
+        mIsDeployed = false;
+        mAssetDeploymentDate = "...";
     }
 }
 

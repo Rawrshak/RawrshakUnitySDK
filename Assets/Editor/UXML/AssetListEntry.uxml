@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>   
+    <engine:Box name="asset-box" style="flex-direction: Row; font-size: 12px;" >
+        <engine:Label name="name" style="width: 70%;" binding-path="mName" />
+        <engine:Box name="deploy-box" style="width: 30%;" >
+            <engine:Box name="pre-deploy-box" style="flex-direction: Row;" >
+                <engine:Toggle name="selected-asset" value="false" binding-path="mSelectedForUploading" />
+            </engine:Box >
+            <engine:Box name="post-deploy-box" style="flex-direction: Row;" >
+                <engine:Label name="upload-date-label" />
+            </engine:Box >
+        </engine:Box>
+    </engine:Box>    
+</engine:UXML>

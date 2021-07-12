@@ -15,6 +15,7 @@ public class AssetsManager : ScriptableObject
     public Box mAssetInfoBox;
     public Box mHelpBoxHolder;
     public Button mGenerateAssetButton;
+    public Button mDeployAssetsButton;
     public AssetData mSelected;
 
     public Wallet mWallet;
@@ -25,10 +26,10 @@ public class AssetsManager : ScriptableObject
     VisualTreeAsset mAssetListEntryTreeAsset;
 
     // Static Variables
-    // static string sAssetsFileLocation = "Assets/Editor/Resources/Assets/";
+    static string sAssetsFileLocation = "Assets/Editor/Resources/Assets";
 
     // Data
-    // private List<AssetData> mAssetData;
+    private List<AssetData> mAssetDataList;
 
     public void Init(Wallet wallet, ContentContractManager contentContractManager)
     {
@@ -36,28 +37,29 @@ public class AssetsManager : ScriptableObject
         mWallet = wallet;
         mSelected = null;
 
-        // if (mAssetData == null) {
-        //     mAssetData = new List<AssetData>();
-        // }
+        if (mAssetDataList == null) {
+            mAssetDataList = new List<AssetData>();
+        }
 
-        // // Load all Assets in Resources/Assets
-        // foreach (AssetDAta asset in Resources.FindObjectsOfTypeAll(typeof(AssetDAta)) as AssetDAta[])
-        // {
-        //     // Only Load assets that are stored
-        //     if (EditorUtility.IsPersistent(asset))
-        //     {
-        //         mAssetData.Add(asset);
-        //         Debug.Log("Adding Asset: " + asset.mName + ", ID: " + asset.GetInstanceID());
-        //     }
-        // }
+        // Load all Assets in Resources/Assets
+        foreach (AssetData asset in Resources.FindObjectsOfTypeAll(typeof(AssetData)) as AssetData[])
+        {
+            // Only Load assets that are stored
+            if (EditorUtility.IsPersistent(asset))
+            {
+                // Set Non-serialized data to default values
+                mAssetDataList.Add(asset);
+                Debug.Log("Adding Asset: " + asset.mName + ", ID: " + asset.GetInstanceID());
+            }
+        }
 
         LoadUXML();
     }
 
     private void LoadUXML()
     {
-        // mAssetInfoTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/AssetDataInfo.uxml");
-        // mAssetListEntryTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/AssetListEntry.uxml");
+        mAssetInfoTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/AssetDataInfo.uxml");
+        mAssetListEntryTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/AssetListEntry.uxml");
     }
 
     public void CleanUp()
@@ -94,6 +96,23 @@ public class AssetsManager : ScriptableObject
         mGenerateAssetButton.clicked += () => {
             GenerateAsset();
         };
+        
+        mDeployAssetsButton.clicked += () => {
+            foreach (var asset in mAssetDataList)
+            {
+                if (asset.mSelectedForUploading)
+                {
+                    asset.mSelectedForUploading = false;
+                    asset.mAssetDeploymentDate = DateTime.Now.ToString();
+                    asset.mIsDeployed = true;
+
+                    // Todo: Delete asset files as it will now be data pulled from
+                    //       GraphQL
+                }
+            }
+
+            RefreshAssetList();
+        };
 
         RefreshAssetList();
         LoadAssetInfo(mSelected);
@@ -101,14 +120,14 @@ public class AssetsManager : ScriptableObject
 
     private void GenerateAsset()
     {
-        // AssetData asset = ScriptableObject.CreateInstance<AssetData>();
-        // asset.Init(mSettings.developerName, mWallet.publicKey);
-        // mAssetData.Add(asset);
+        AssetData asset = ScriptableObject.CreateInstance<AssetData>();
+        asset.Init();
+        mAssetDataList.Add(asset);
         
-        // CreateAssetFile(asset);
+        CreateAssetFile(asset);
 
-        // LoadAssetInfo(asset);
-        // Debug.Log("Generating Contract from " + contract.mDeveloperAddress);
+        LoadAssetInfo(asset);
+        Debug.Log("Generating Asset: " + asset.GetInstanceID());
 
         RefreshAssetList();
     }
@@ -120,16 +139,16 @@ public class AssetsManager : ScriptableObject
             return;
         }
         
-        // mAssetInfoBox.Clear();
+        mAssetInfoBox.Clear();
         
-        // TemplateContainer assetTree = mAssetInfoTreeAsset.CloneTree();
+        TemplateContainer assetTree = mAssetInfoTreeAsset.CloneTree();
 
-        // var infoSection = assetTree.contentContainer.Query<Box>("content-contract-info-section").First();
-        // SerializedObject so = new SerializedObject(contract);
-        // infoSection.Bind(so);
+        var infoSection = assetTree.contentContainer.Query<Box>("asset-info-section").First();
+        SerializedObject so = new SerializedObject(asset);
+        infoSection.Bind(so);
         
-        // // Add this to info box
-        // mAssetInfoBox.Add(assetTree);
+        // Add this to info box
+        mAssetInfoBox.Add(assetTree);
 
         mSelected = asset;
         Debug.Log("Selected Content Contract: " + asset.mName);
@@ -137,71 +156,47 @@ public class AssetsManager : ScriptableObject
 
     private void RefreshAssetList()
     {
-        // mContractEntriesBox.Clear();
+        mAssetListBox.Clear();
 
-        // foreach (var contract in mContentContracts)
-        // {
-        //     TemplateContainer assetTree = mContractListEntry.CloneTree();
+        foreach (var asset in mAssetDataList)
+        {
+            TemplateContainer assetTree = mAssetListEntryTreeAsset.CloneTree();
             
-        //     var entry = assetTree.contentContainer.Query<Box>("content-contract-box").First();
-        //     SerializedObject so = new SerializedObject(contract);
-        //     entry.Bind(so);
+            var entry = assetTree.contentContainer.Query<Box>("asset-box").First();
+            SerializedObject so = new SerializedObject(asset);
+            entry.Bind(so);
 
-        //     var deployBox = assetTree.contentContainer.Query<Box>("deploy-box").First();
-        //     var preDeployBox = assetTree.contentContainer.Query<Box>("pre-deploy-box").First();
-        //     var postDeployBox = assetTree.contentContainer.Query<Box>("post-deploy-box").First();
-        //     if (contract.isDeployed)
-        //     {
-        //         deployBox.contentContainer.Remove(preDeployBox);
+            var deployBox = assetTree.contentContainer.Query<Box>("deploy-box").First();
+            var preDeployBox = assetTree.contentContainer.Query<Box>("pre-deploy-box").First();
+            var postDeployBox = assetTree.contentContainer.Query<Box>("post-deploy-box").First();
+
+            Debug.Log("Asset Deployed: " + asset.mIsDeployed);
+            if (asset.mIsDeployed)
+            {
+                deployBox.contentContainer.Remove(preDeployBox);
                 
-        //         var uploadDateLabel = assetTree.contentContainer.Query<Label>("upload-date-label").First();
-        //         uploadDateLabel.text = contract.mContractDeploymentDate;
-        //     }
-        //     else
-        //     {
-        //         deployBox.contentContainer.Remove(postDeployBox);
-        //         var deployButton = assetTree.contentContainer.Query<Button>("deploy-button").First();
-        //         var deleteButton = assetTree.contentContainer.Query<Button>("delete-button").First();
+                var uploadDateLabel = assetTree.contentContainer.Query<Label>("upload-date-label").First();
+                uploadDateLabel.text = asset.mAssetDeploymentDate;
+            }
+            else
+            {
+                deployBox.contentContainer.Remove(postDeployBox);
+            }
 
-        //         deployButton.clicked += () => {
-        //             // Debug.Log("Contract Name: " + contract.mName);
-        //             contract.isDeployed = true;
+            // Select Content Contract Callback
+            entry.RegisterCallback<MouseDownEvent>((evt) => {
+                Debug.Log("Info to Display: " + asset.mName);
+                LoadAssetInfo(asset);
+            });
 
-        //             contract.mContractDeploymentDate = DateTime.Now.ToString();
-        //             RefreshContractList();
-        //         };
-
-        //         deleteButton.clicked += () => {
-        //             Debug.Log("Delete Name: " + contract.name);
-
-        //             // Delete file and .meta filefirst
-        //             string fileName = String.Format("{0}/{1}.asset", sContentContractFileLocation, contract.name);
-        //             File.Delete(fileName);
-        //             File.Delete(fileName + ".meta");
-        //             AssetDatabase.Refresh();
-
-        //             mContentContracts.Remove(contract);
-
-        //             Debug.Log("Deleting File: " + fileName);
-        //             Debug.Log("Content contract list length: " + mContentContracts.Count);
-        //             RefreshContractList();
-        //         };
-        //     }
-
-        //     // Select Content Contract Callback
-        //     entry.RegisterCallback<MouseDownEvent>((evt) => {
-        //         Debug.Log("Info to Display: " + contract.mName);
-        //         LoadContractInfo(contract);
-        //     });
-
-        //     mContractEntriesBox.Add(assetTree);
-        // }
+            mAssetListBox.Add(assetTree);
+        }
     }
 
-    // private void CreateContentContractFile(ContentContract contract)
-    // {
-    //     string fileName = String.Format("{0}/Contract_{1}.asset", sContentContractFileLocation, contract.GetInstanceID());
-    //     AssetDatabase.CreateAsset(contract, fileName);
-    //     AssetDatabase.SaveAssets();
-    // }
+    private void CreateAssetFile(AssetData asset)
+    {
+        string fileName = String.Format("{0}/Contract_{1}.asset", sAssetsFileLocation, asset.GetInstanceID());
+        AssetDatabase.CreateAsset(asset, fileName);
+        AssetDatabase.SaveAssets();
+    }
 }

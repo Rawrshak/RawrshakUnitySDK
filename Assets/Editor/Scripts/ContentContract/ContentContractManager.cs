@@ -22,7 +22,7 @@ public class ContentContractManager : ScriptableObject
     VisualTreeAsset mContractListEntry;
 
     // Static Variables
-    static string sContentContractFileLocation = "Assets/Editor/Resources/ContentContracts/";
+    static string sContentContractFileLocation = "Assets/Editor/Resources/ContentContracts";
 
     // Data
     private List<ContentContract> mContentContracts;

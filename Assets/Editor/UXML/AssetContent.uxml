@@ -24,7 +24,8 @@
             </engine:Box> 
 
             <engine:Box name="asset-entries" />
-        </engine:ScrollView>        
+        </engine:ScrollView>   
+        <engine:Button name="deploy-button" text="Deploy Selected Assets" />     
     </engine:Foldout>
 
     <engine:Box >

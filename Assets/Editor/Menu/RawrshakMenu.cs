@@ -213,7 +213,7 @@ public class RawrshakMenu : EditorWindow
         // Load Keystore 
         keystoreLocation.value = wallet.keyStoreLocation;
         keystoreLoadButton.clicked += () => {
-            if (password.value == "" || keystoreLocation.value == "") {
+            if (String.IsNullOrEmpty(password.value) || String.IsNullOrEmpty(keystoreLocation.value)) {
                 Debug.Log("shit is null");
                 OnWalletLoadError("Error: Empty Keystore location or password.");
                 return;
@@ -228,7 +228,7 @@ public class RawrshakMenu : EditorWindow
 
         // Set up Load Wallet and Save to file Button
         loadWalletButton.clicked += () => {
-            if (newPassword.value == "") {
+            if (String.IsNullOrEmpty(newPassword.value)) {
                 OnWalletLoadError("Error: Password cannot be empty.");
                 return;
             }
@@ -279,6 +279,7 @@ public class RawrshakMenu : EditorWindow
         assetsManager.mWalletLabel = rootVisualElement.Query<Label>("wallet-label").First();
         assetsManager.mContentContractLabel = rootVisualElement.Query<Label>("content-label").First();
         assetsManager.mGenerateAssetButton = rootVisualElement.Query<Button>("generate-asset-button").First();
+        assetsManager.mDeployAssetsButton = rootVisualElement.Query<Button>("deploy-button").First();
 
         assetsManager.LoadAssetsUI();
     }

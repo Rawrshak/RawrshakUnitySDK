@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:Box name="asset-info-section" >
+        <engine:TextField name="name" label="Asset Name" binding-path="mName" />
+        <editor:IntegerField name="id" label="Id" binding-path="mId" />
+        <engine:TextField name="metadata-uri" label="Metadata Uri" binding-path="mMetadataUri" />
+        <engine:TextField name="hidden-metadata-uri" label="Hidden Metadata Uri" binding-path="mHiddenMetadataUri" />
+    </engine:Box >
+</engine:UXML>
