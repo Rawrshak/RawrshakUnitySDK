@@ -68,9 +68,15 @@ public class AssetsManager : ScriptableObject
         AssetDatabase.SaveAssets();
     }
 
-    public void LoadAssetsUI()
+    public void LoadUI(VisualElement root)
     {
-        mHelpBoxHolder.Clear();
+        mHelpBoxHolder = root.Query<Box>("helpbox-holder").First();
+        mAssetListBox = root.Query<Box>("asset-entries").First();
+        mAssetInfoBox = root.Query<Box>("asset-info").First();
+        mWalletLabel = root.Query<Label>("wallet-label").First();
+        mContentContractLabel = root.Query<Label>("content-label").First();
+        mGenerateAssetButton = root.Query<Button>("generate-asset-button").First();
+        mDeployAssetsButton = root.Query<Button>("deploy-button").First();
 
         if (mContentContractManager.mSelected == null || !mContentContractManager.mSelected.isDeployed)
         {

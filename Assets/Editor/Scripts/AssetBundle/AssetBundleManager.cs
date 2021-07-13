@@ -9,40 +9,43 @@ using System.IO;
 public class AssetBundleManager : ScriptableObject
 {
     // Private Properties
-    public string assetBundlesInfoLocation;
-    AssetBundle assetBundle;
-    AssetBundleManifest manifest;
+    private string mAssetBundlesInfoLocation;
+    private AssetBundle mAssetBundle;
+    private AssetBundleManifest mManifest;
 
-    string assetBundlePath;
+    private string mAssetBundlePath;
 
-    AssetBundlesInfo assetBundlesInfo;
+    private AssetBundlesInfo mAssetBundlesInfo;
 
-    public Box assetBundleEntries;
-    public Box uploadedAsssetBundleEntries;
-    public Box assetBundleInfoBox;
+    private Box mAssetBundleEntries;
+    private Box mUploadedAsssetBundleEntries;
+    private Box mAssetBundleInfoBox;
+    private Box mHelpBox;
 
-    Dictionary<string, AssetBundleData> newAssetBundles;
+    private RawrshakSettings mRawrshakSettings;
+    Dictionary<string, AssetBundleData> mNewAssetBundles;
 
-    public void Init(string path)
+    public void Init(RawrshakSettings rawrshakSettings)
     {
-        assetBundlePath = path;
-        newAssetBundles = new Dictionary<string, AssetBundleData>();
-        assetBundlesInfoLocation = "Assets/Editor/Resources/AssetBundlesInfo.json";
+        mRawrshakSettings = rawrshakSettings;
+        mAssetBundlePath = Application.dataPath + "/" + mRawrshakSettings.assetBundleFolder;
+        mNewAssetBundles = new Dictionary<string, AssetBundleData>();
+        mAssetBundlesInfoLocation = "Assets/Editor/Resources/AssetBundlesInfo.json";
         LoadAssetBundle();
 
-        if (assetBundlesInfo == null)
+        if (mAssetBundlesInfo == null)
         {
             TextAsset jsonFile = Resources.Load("AssetBundlesInfo") as TextAsset;
             if (jsonFile)
             {
-                assetBundlesInfo = AssetBundlesInfo.CreateFromJSON(jsonFile.text);
-                Debug.Log("AssetBundlesInfo Length: " + assetBundlesInfo.mDictionary.Count);
+                mAssetBundlesInfo = AssetBundlesInfo.CreateFromJSON(jsonFile.text);
+                Debug.Log("AssetBundlesInfo Length: " + mAssetBundlesInfo.mDictionary.Count);
             }
             else
             {
-                assetBundlesInfo = new AssetBundlesInfo();
-                assetBundlesInfo.mDictionary = new Dictionary<Hash128, AssetBundleData>();
-                assetBundlesInfo.mData = new List<AssetBundleData>();
+                mAssetBundlesInfo = new AssetBundlesInfo();
+                mAssetBundlesInfo.mDictionary = new Dictionary<Hash128, AssetBundleData>();
+                mAssetBundlesInfo.mData = new List<AssetBundleData>();
                 Debug.Log("AssetBundlesInfo Length: 0 - Creating new asset bundle info.");
             }
         }
@@ -53,32 +56,32 @@ public class AssetBundleManager : ScriptableObject
     public string[] GetAllAssetBundleNames()
     {
         LoadAssetBundle();
-        return manifest.GetAllAssetBundles();
+        return mManifest.GetAllAssetBundles();
     }
 
     public Hash128 GetAssetBundleHash(string name)
     {
         LoadAssetBundle();
-        return manifest.GetAssetBundleHash(name);
+        return mManifest.GetAssetBundleHash(name);
     }
 
     public void Refresh()
     {
         // clear all entries first
-        assetBundleEntries.Clear();
-        newAssetBundles.Clear();
+        mAssetBundleEntries.Clear();
+        mNewAssetBundles.Clear();
 
         // Load Entry UML
         var entry = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/NewAssetBundleEntry.uxml");
 
         LoadAssetBundle();
-        var bundleNames = manifest.GetAllAssetBundles();
+        var bundleNames = mManifest.GetAllAssetBundles();
         foreach(string name in bundleNames)
         {
             var hash = GetAssetBundleHash(name);
             Debug.Log("AssetBundle: " + name + ", hash: " + hash);
 
-            if (assetBundlesInfo.mDictionary.ContainsKey(hash))
+            if (mAssetBundlesInfo.mDictionary.ContainsKey(hash))
             {
                 continue;
             }
@@ -87,11 +90,11 @@ public class AssetBundleManager : ScriptableObject
             entryTree.contentContainer.Query<Label>("asset-bundle-name").First().text = name;
             entryTree.contentContainer.Query<Label>("asset-bundle-hash").First().text = hash.ToString();
             
-            assetBundleEntries.Add(entryTree);
+            mAssetBundleEntries.Add(entryTree);
 
             // find or add the asset bundle in the new asset bundle lists
             AssetBundleData assetBundleData = new AssetBundleData(hash, name);
-            newAssetBundles.Add(name, assetBundleData);
+            mNewAssetBundles.Add(name, assetBundleData);
 
             // Set Toggle Callback
             var selectedToggle = entryTree.contentContainer.Query<Toggle>("asset-bundle-selected").First();
@@ -109,41 +112,74 @@ public class AssetBundleManager : ScriptableObject
             });
         }
 
-        Debug.Log("New Asset Bundle Size: " + newAssetBundles.Count);
+        Debug.Log("New Asset Bundle Size: " + mNewAssetBundles.Count);
     }
 
     public void CleanUp()
     {
         Debug.Log("Unloading Asset Bundles.");
-        if (assetBundle)
+        if (mAssetBundle)
         {
-            assetBundle.Unload(true);   
+            mAssetBundle.Unload(true);   
         }
-        manifest = null;
+        mManifest = null;
         // SaveAssetBundlesInfo();
+    }
+    
+    public void LoadUI(VisualElement root)
+    {
+        mHelpBox = root.Query<Box>("helpbox-holder").First();
+
+        var generateAssetBundles = root.Query<Button>("create-asset-bundles-button").First();
+        generateAssetBundles.clicked += () => {
+            CreateAssetBundles.BuildAllAssetBundles(mRawrshakSettings.buildTarget);
+            Refresh();
+        };
+
+        mAssetBundleEntries = root.Query<Box>("asset-bundle-entries").First();
+        mUploadedAsssetBundleEntries = root.Query<Box>("uploaded-asset-bundle-entries").First();
+        mAssetBundleInfoBox = root.Query<Box>("asset-bundle-info").First();
+
+        // var printButton = root.Query<Button>("print-button").First();
+        // printButton.clicked += () => {
+        //     Refresh();
+        // };
+        
+        var uploadButton = root.Query<Button>("upload-button").First();
+        uploadButton.clicked += () => {
+            UploadAssetBundles();
+
+            // Update UI
+            Refresh();
+            RefreshUploadedAssetBundlesBox();
+        };
+
+        // Refresh some UI
+        Refresh();
+        RefreshUploadedAssetBundlesBox();
     }
 
     public void UploadAssetBundles()
     {
         // Get the selected Asset Bundles
-        var iter = newAssetBundles.GetEnumerator();
+        var iter = mNewAssetBundles.GetEnumerator();
         List<string> bundlesToUpload = new List<string>();
         while(iter.MoveNext())
         {
             if (iter.Current.Value.mSelectedForUploading)
             {
-                Debug.Log(assetBundlePath + iter.Current.Value.mName);
+                Debug.Log(mAssetBundlePath + iter.Current.Value.mName);
                 bundlesToUpload.Add(iter.Current.Key);
             }
         }
-        Debug.Log("Dictionary Size left: " + newAssetBundles.Count);
+        Debug.Log("Dictionary Size left: " + mNewAssetBundles.Count);
 
         // Upload the asset bundles to storage
         var uploadIter = bundlesToUpload.GetEnumerator();
         while (uploadIter.MoveNext())
         {
-            var bundle = newAssetBundles[uploadIter.Current];
-            if (assetBundlesInfo.mDictionary.ContainsKey(bundle.mHashId))
+            var bundle = mNewAssetBundles[uploadIter.Current];
+            if (mAssetBundlesInfo.mDictionary.ContainsKey(bundle.mHashId))
             {
                 // ignore; Don't need to upload what has already been uploaded.
                 continue;
@@ -152,7 +188,7 @@ public class AssetBundleManager : ScriptableObject
             // Todo: upload to storage
 
             // Remove from new asset bundles list
-            newAssetBundles.Remove(uploadIter.Current);
+            mNewAssetBundles.Remove(uploadIter.Current);
 
             // Update Asset Bundle Data
             bundle.mSelectedForUploading = false;
@@ -160,21 +196,21 @@ public class AssetBundleManager : ScriptableObject
             
             // Todo: Update Transaction ID and Transaction URI
 
-            // Add to assetBundlesInfo
-            assetBundlesInfo.mDictionary.Add(bundle.mHashId, bundle);
+            // Add to mAssetBundlesInfo
+            mAssetBundlesInfo.mDictionary.Add(bundle.mHashId, bundle);
         }
     }
 
     public void RefreshUploadedAssetBundlesBox()
     {
         // clear all entries first
-        uploadedAsssetBundleEntries.Clear();
+        mUploadedAsssetBundleEntries.Clear();
 
         // Load Entry UML
         var entry = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/UploadedAssetBundleEntry.uxml");
 
         // Upload Asset Bundle Box with new entries
-        var iter = assetBundlesInfo.mDictionary.GetEnumerator();
+        var iter = mAssetBundlesInfo.mDictionary.GetEnumerator();
         while (iter.MoveNext())
         {
             var bundle = iter.Current.Value;
@@ -184,7 +220,7 @@ public class AssetBundleManager : ScriptableObject
             entryTree.contentContainer.Query<Label>("asset-bundle-name").First().text = bundle.mName;
             entryTree.contentContainer.Query<Label>("asset-bundle-uri").First().text = bundle.mHash;
             
-            uploadedAsssetBundleEntries.Add(entryTree);
+            mUploadedAsssetBundleEntries.Add(entryTree);
             
             // Select Asset Bundle Callback to show info
             entryTree.RegisterCallback<MouseDownEvent>((evt) => {
@@ -200,7 +236,7 @@ public class AssetBundleManager : ScriptableObject
 
     private void ViewAssetBundleInfo(AssetBundleData bundle)
     {
-        assetBundleInfoBox.Clear();
+        mAssetBundleInfoBox.Clear();
         var entry = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/AssetBundleDetails.uxml");
         TemplateContainer entryTree = entry.CloneTree();
         entryTree.contentContainer.Query<TextField>("name").First().value = bundle.mName;
@@ -214,39 +250,39 @@ public class AssetBundleManager : ScriptableObject
         entryTree.contentContainer.Query<TextField>("uploaded-timestamp").First().value = bundle.mUploadedTimestamp;
         entryTree.contentContainer.Query<TextField>("uploaded-timestamp").First().SetEnabled(false);
         
-        assetBundleInfoBox.Add(entryTree);
+        mAssetBundleInfoBox.Add(entryTree);
     }
 
     private void LoadAssetBundle()
     {
-        if (assetBundle == null)
+        if (mAssetBundle == null)
         {
             Debug.Log("Loading Asset Bundle.");
             // Todo: replace "/AssetBundles" with the folderName
-            assetBundle = AssetBundle.LoadFromFile(assetBundlePath + "/AssetBundles");
+            mAssetBundle = AssetBundle.LoadFromFile(mAssetBundlePath + "/AssetBundles");
         }
 
-        if (manifest == null)
+        if (mManifest == null)
         {
-            manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+            mManifest = mAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
         }
     }
 
     public void SaveAssetBundlesInfo()
     {
-        Debug.Log("AssetBundlesInfo length: " + assetBundlesInfo.mDictionary.Count);
-        if (assetBundlesInfo == null || assetBundlesInfo.mDictionary == null) {
+        Debug.Log("AssetBundlesInfo length: " + mAssetBundlesInfo.mDictionary.Count);
+        if (mAssetBundlesInfo == null || mAssetBundlesInfo.mDictionary == null) {
             return;
         }
-        string data = assetBundlesInfo.SaveToJSON();
+        string data = mAssetBundlesInfo.SaveToJSON();
         Debug.Log("Json File: " + data);
         
         // Delete file and .meta filefirst
-        File.Delete(assetBundlesInfoLocation);
-        File.Delete(assetBundlesInfoLocation + ".meta");
+        File.Delete(mAssetBundlesInfoLocation);
+        File.Delete(mAssetBundlesInfoLocation + ".meta");
         
         // write file 
-        StreamWriter writer = new StreamWriter(assetBundlesInfoLocation, true);
+        StreamWriter writer = new StreamWriter(mAssetBundlesInfoLocation, true);
         writer.WriteLine(data);
         writer.Close();
         AssetDatabase.Refresh();

@@ -64,7 +64,7 @@ public class RawrshakMenu : EditorWindow
         }
 
         assetBundleManager = ScriptableObject.CreateInstance<AssetBundleManager>();
-        assetBundleManager.Init(Application.dataPath + "/" + settingsManager.mRawrshakSettings.assetBundleFolder);
+        assetBundleManager.Init(settingsManager.mRawrshakSettings);
 
         contentContractManager = ScriptableObject.CreateInstance<ContentContractManager>();
         contentContractManager.Init(walletManager, settingsManager.mRawrshakSettings);
@@ -161,15 +161,15 @@ public class RawrshakMenu : EditorWindow
                 break;
             }
             case "contract-button": {
-                LoadContractPage();
+                contentContractManager.LoadUI(rootVisualElement);
                 break;
             }
             case "asset-button": {
-                LoadAssetPage();
+                assetsManager.LoadUI(rootVisualElement);
                 break;
             }
             case "asset-bundle-button": {
-                LoadAssetBundlePage();
+                assetBundleManager.LoadUI(rootVisualElement);
                 break;
             }
             case "wallet-button":
@@ -179,60 +179,4 @@ public class RawrshakMenu : EditorWindow
             }
         }
     }
-
-    private void LoadContractPage() {
-        var helpboxHolder = rootVisualElement.Query<Box>("helpbox-holder").First();
-
-        contentContractManager.mContractEntriesBox = rootVisualElement.Query<Box>("contract-entries").First();
-        contentContractManager.mContentContractInfoBox = rootVisualElement.Query<Box>("content-contract-info").First();
-        contentContractManager.mWalletLabel = rootVisualElement.Query<Label>("wallet-label").First();
-        contentContractManager.mGenerateContractButton = rootVisualElement.Query<Button>("generate-content-contract-button").First();
-
-        contentContractManager.LoadContentContractUI();
-    }
-
-    private void LoadAssetPage() {
-        assetsManager.mHelpBoxHolder = rootVisualElement.Query<Box>("helpbox-holder").First();
-
-        assetsManager.mAssetListBox = rootVisualElement.Query<Box>("asset-entries").First();
-        assetsManager.mAssetInfoBox = rootVisualElement.Query<Box>("asset-info").First();
-        assetsManager.mWalletLabel = rootVisualElement.Query<Label>("wallet-label").First();
-        assetsManager.mContentContractLabel = rootVisualElement.Query<Label>("content-label").First();
-        assetsManager.mGenerateAssetButton = rootVisualElement.Query<Button>("generate-asset-button").First();
-        assetsManager.mDeployAssetsButton = rootVisualElement.Query<Button>("deploy-button").First();
-
-        assetsManager.LoadAssetsUI();
-    }
-
-    private void LoadAssetBundlePage() {
-        var helpboxHolder = rootVisualElement.Query<Box>("helpbox-holder").First();
-
-        var generateAssetBundles = rootVisualElement.Query<Button>("create-asset-bundles-button").First();
-        generateAssetBundles.clicked += () => {
-            CreateAssetBundles.BuildAllAssetBundles(settingsManager.mRawrshakSettings.buildTarget);
-        };
-
-        assetBundleManager.assetBundleEntries = rootVisualElement.Query<Box>("asset-bundle-entries").First();
-        assetBundleManager.uploadedAsssetBundleEntries = rootVisualElement.Query<Box>("uploaded-asset-bundle-entries").First();
-        assetBundleManager.assetBundleInfoBox = rootVisualElement.Query<Box>("asset-bundle-info").First();
-
-        // var printButton = rootVisualElement.Query<Button>("print-button").First();
-        // printButton.clicked += () => {
-        //     assetBundleManager.Refresh();
-        // };
-        
-        var uploadButton = rootVisualElement.Query<Button>("upload-button").First();
-        uploadButton.clicked += () => {
-            assetBundleManager.UploadAssetBundles();
-
-            // Update UI
-            assetBundleManager.Refresh();
-            assetBundleManager.RefreshUploadedAssetBundlesBox();
-        };
-
-        // Refresh some UI
-        assetBundleManager.Refresh();
-        assetBundleManager.RefreshUploadedAssetBundlesBox();
-    }
-
 }

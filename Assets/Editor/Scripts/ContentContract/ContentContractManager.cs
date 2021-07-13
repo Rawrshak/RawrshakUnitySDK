@@ -15,6 +15,7 @@ public class ContentContractManager : ScriptableObject
     public Box mContentContractInfoBox;
     public Label mWalletLabel;
     public Button mGenerateContractButton;
+    public Box mHelpBox;
     public ContentContract mSelected;
 
     // Private UXML
@@ -63,8 +64,14 @@ public class ContentContractManager : ScriptableObject
         AssetDatabase.SaveAssets();
     }
 
-    public void LoadContentContractUI()
+    public void LoadUI(VisualElement root)
     {
+        mHelpBox = root.Query<Box>("helpbox-holder").First();
+        mContractEntriesBox = root.Query<Box>("contract-entries").First();
+        mContentContractInfoBox = root.Query<Box>("content-contract-info").First();
+        mWalletLabel = root.Query<Label>("wallet-label").First();
+        mGenerateContractButton = root.Query<Button>("generate-content-contract-button").First();
+
         mWalletLabel.text = "Current Wallet Loaded: " + mWallet.GetPublicKey();
 
         mGenerateContractButton.clicked += () => {
