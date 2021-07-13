@@ -19,7 +19,7 @@ public class RawrshakMenu : EditorWindow
     // Menu Properties
     string selectedButton = "wallet-button";
     private static Wallet wallet; 
-    private static Settings settings;
+    private static SettingsManager settingsManager;
     private static AssetBundleManager assetBundleManager;
     private static ContentContractManager contentContractManager;
     private static AssetsManager assetsManager;
@@ -65,19 +65,17 @@ public class RawrshakMenu : EditorWindow
         wallet.AddOnWalletLoadErrorListner(OnWalletLoadError);
 
         // Load Settings
-        settings = Resources.Load<Settings>("RawrshakSettings");
-        if (settings == null) {
-            settings = ScriptableObject.CreateInstance<Settings>();
-            settings.Init();
-            AssetDatabase.CreateAsset(settings, "Assets/Editor/Resources/RawrshakSettings.asset");
-            AssetDatabase.SaveAssets();
+        if (settingsManager == null)
+        {
+            settingsManager = ScriptableObject.CreateInstance<SettingsManager>();
+            settingsManager.Init();
         }
 
         assetBundleManager = ScriptableObject.CreateInstance<AssetBundleManager>();
-        assetBundleManager.Init(Application.dataPath + "/" + settings.assetBundleFolder);
+        assetBundleManager.Init(Application.dataPath + "/" + settingsManager.mRawrshakSettings.assetBundleFolder);
 
         contentContractManager = ScriptableObject.CreateInstance<ContentContractManager>();
-        contentContractManager.Init(wallet, settings);
+        contentContractManager.Init(wallet, settingsManager.mRawrshakSettings);
         
         assetsManager = ScriptableObject.CreateInstance<AssetsManager>();
         assetsManager.Init(wallet, contentContractManager);
@@ -167,7 +165,7 @@ public class RawrshakMenu : EditorWindow
         
         switch(buttonName) {
             case "settings-button": {
-                LoadSettingsPage();
+                settingsManager.LoadUI(rootVisualElement);
                 break;
             }
             case "contract-button": {
@@ -247,19 +245,6 @@ public class RawrshakMenu : EditorWindow
         };
     }
 
-    private void LoadSettingsPage() {
-        var mainPage = rootVisualElement.Query<Box>("settings-foldout-box").First();
-
-        SerializedObject so = new SerializedObject(settings);
-        mainPage.Bind(so);
-
-        var saveButton = rootVisualElement.Query<Button>("save-button").First();
-        saveButton.clicked += () => {
-            VerifySettings();
-            SaveSettings();
-        };
-    }
-
     private void LoadContractPage() {
         var helpboxHolder = rootVisualElement.Query<Box>("helpbox-holder").First();
 
@@ -289,7 +274,7 @@ public class RawrshakMenu : EditorWindow
 
         var generateAssetBundles = rootVisualElement.Query<Button>("create-asset-bundles-button").First();
         generateAssetBundles.clicked += () => {
-            CreateAssetBundles.BuildAllAssetBundles(settings.buildTarget);
+            CreateAssetBundles.BuildAllAssetBundles(settingsManager.mRawrshakSettings.buildTarget);
         };
 
         assetBundleManager.assetBundleEntries = rootVisualElement.Query<Box>("asset-bundle-entries").First();
@@ -335,49 +320,5 @@ public class RawrshakMenu : EditorWindow
         HelpBox helpbox = new HelpBox(e, HelpBoxMessageType.Error);
         helpboxHolder.Clear();
         helpboxHolder.Add(helpbox);
-    }
-
-    private void SaveSettings() {
-        var developerName = rootVisualElement.Query<TextField>("developer-name").First();
-        settings.developerName = developerName.text;
-
-        var assetBundleFolder = rootVisualElement.Query<TextField>("asset-bundle-folder").First();
-        settings.assetBundleFolder = assetBundleFolder.text;
-
-        var buildTarget = rootVisualElement.Query<EnumField>("build-target").First();
-        settings.buildTarget = (Rawrshak.SupportedBuildTargets)buildTarget.value;
-
-        var ethereumUri = rootVisualElement.Query<TextField>("ethereum-uri").First();
-        settings.ethereumGatewayUri = ethereumUri.text;
-
-        var networkId = rootVisualElement.Query<EnumField>("network-id").First();
-        settings.networkId = (Rawrshak.EthereumNetwork)networkId.value;
-
-        var chainId = rootVisualElement.Query<TextField>("chain-id").First();
-        settings.chainId = int.Parse(chainId.text);
-
-        var port = rootVisualElement.Query<TextField>("port").First();
-        settings.port = int.Parse(port.text);
-
-        var defaultGasPrice = rootVisualElement.Query<TextField>("default-gas-price").First();
-        settings.defaultGasPrice = int.Parse(defaultGasPrice.text);
-
-        var graphNodeUri = rootVisualElement.Query<TextField>("graph-node-uri").First();
-        settings.graphNodeUri = graphNodeUri.text;
-
-        var arweaveGatewayUri = rootVisualElement.Query<TextField>("arweave-uri").First();
-        settings.arweaveGatewayUri = arweaveGatewayUri.text;
-
-        var arweaveWalletFile = rootVisualElement.Query<TextField>("arweave-wallet-file").First();
-        settings.arweaveWalletFile = arweaveWalletFile.text;
-
-        AssetDatabase.SaveAssets();
-    }
-
-    private void VerifySettings() {
-        // Check if asset bundle folder exists
-        // Check if we can connect to ethereum 
-        // check if we can connect to arweave
-        // check if we can connect to the graph node
     }
 }

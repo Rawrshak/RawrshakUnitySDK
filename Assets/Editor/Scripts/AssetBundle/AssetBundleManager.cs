@@ -222,7 +222,8 @@ public class AssetBundleManager : ScriptableObject
         if (assetBundle == null)
         {
             Debug.Log("Loading Asset Bundle.");
-            assetBundle = AssetBundle.LoadFromFile(assetBundlePath + "AssetBundles");
+            // Todo: replace "/AssetBundles" with the folderName
+            assetBundle = AssetBundle.LoadFromFile(assetBundlePath + "/AssetBundles");
         }
 
         if (manifest == null)

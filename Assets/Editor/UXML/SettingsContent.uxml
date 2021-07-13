@@ -14,7 +14,7 @@
             <engine:TextField name="developer-name" label="Developer Name" binding-path="developerName" />
         </engine:Foldout>
 
-        <engine:Foldout class="foldout-style" name="Rawrshak-settings" text="Rawrshak">
+        <engine:Foldout class="foldout-style" name="rawrshak-settings" text="Rawrshak">
             <engine:TextField name="asset-bundle-folder" label="Asset Bundle Folder" binding-path="assetBundleFolder" />
             <editor:EnumField name="build-target" label="Build Target" binding-path="buildTarget" />
         </engine:Foldout>
@@ -22,9 +22,9 @@
         <engine:Foldout class="foldout-style" name="ethereum-settings" text="Ethereum">
             <engine:TextField name="ethereum-uri" label="Ethereum URI" binding-path="ethereumGatewayUri" />
             <editor:EnumField name="network-id" label="Network Id" binding-path="networkId" />
-            <engine:TextField name="chain-id" label="Chain Id" binding-path="chainId" />
-            <engine:TextField name="port" label="Port" binding-path="port" />
-            <engine:TextField name="default-gas-price" label="Default Gas Price" binding-path="defaultGasPrice" />
+            <editor:IntegerField name="chain-id" label="Chain Id" binding-path="chainId" />
+            <editor:IntegerField name="port" label="Port" binding-path="port" />
+            <editor:IntegerField name="default-gas-price" label="Default Gas Price" binding-path="defaultGasPrice" />
             <engine:Toggle name="ask-for-password" label="Require Password for every Transaction" binding-path="askForPasswordAtEveryTransaction" />
         </engine:Foldout>
         <engine:Foldout class="foldout-style" name="graphnode-settings" text="The Graph">
@@ -36,7 +36,7 @@
             <engine:TextField name="arweave-wallet-file" label="Wallet File Location" binding-path="arweaveWalletFile" />
         </engine:Foldout>
 
-        <engine:Button name="save-button" text="Save" />
+        <engine:Button name="verify-button" text="Verify" />
 
         <!-- <engine:Foldout name="ipfs-settings" text="IPFS">
             <engine:TextField name="ipfs-uri" label="IPFS Gateway URI" />

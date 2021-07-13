@@ -9,7 +9,7 @@ using UnityEditor.UIElements;
 
 public class ContentContractManager : ScriptableObject
 {
-    public Settings mSettings;
+    public RawrshakSettings mSettings;
     public Wallet mWallet;
     public Box mContractEntriesBox;
     public Box mContentContractInfoBox;
@@ -27,7 +27,7 @@ public class ContentContractManager : ScriptableObject
     // Data
     private List<ContentContract> mContentContracts;
 
-    public void Init(Wallet wallet, Settings settings)
+    public void Init(Wallet wallet, RawrshakSettings settings)
     {
         mSettings = settings;
         mWallet = wallet;
