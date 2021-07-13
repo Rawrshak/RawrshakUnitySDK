@@ -18,7 +18,7 @@ public class RawrshakMenu : EditorWindow
 
     // Menu Properties
     string selectedButton = "wallet-button";
-    private static Wallet wallet; 
+    private static WalletManager walletManager; 
     private static SettingsManager settingsManager;
     private static AssetBundleManager assetBundleManager;
     private static ContentContractManager contentContractManager;
@@ -49,21 +49,6 @@ public class RawrshakMenu : EditorWindow
     }
 
     private void LoadData() {
-        // Load Wallet
-        wallet = Resources.Load<Wallet>("Wallet");
-        if (wallet == null) {
-            wallet = ScriptableObject.CreateInstance<Wallet>();
-            wallet.Init(
-                "Rawrshak Unity SDK Connection",
-                "https://app.warriders.com/favicon.ico",
-                "Rawrshak Unity SDK",
-                "https://app.warriders.com");
-            AssetDatabase.CreateAsset(wallet, "Assets/Editor/Resources/Wallet.asset");
-            AssetDatabase.SaveAssets();
-        }
-        wallet.AddOnWalletLoadListner(OnWalletLoad);
-        wallet.AddOnWalletLoadErrorListner(OnWalletLoadError);
-
         // Load Settings
         if (settingsManager == null)
         {
@@ -71,14 +56,21 @@ public class RawrshakMenu : EditorWindow
             settingsManager.Init();
         }
 
+        // Load Wallet
+        if (walletManager == null)
+        {
+            walletManager = ScriptableObject.CreateInstance<WalletManager>();
+            walletManager.Init(settingsManager.mRawrshakSettings, () => { this.Repaint(); });
+        }
+
         assetBundleManager = ScriptableObject.CreateInstance<AssetBundleManager>();
         assetBundleManager.Init(Application.dataPath + "/" + settingsManager.mRawrshakSettings.assetBundleFolder);
 
         contentContractManager = ScriptableObject.CreateInstance<ContentContractManager>();
-        contentContractManager.Init(wallet, settingsManager.mRawrshakSettings);
+        contentContractManager.Init(walletManager, settingsManager.mRawrshakSettings);
         
         assetsManager = ScriptableObject.CreateInstance<AssetsManager>();
-        assetsManager.Init(wallet, contentContractManager);
+        assetsManager.Init(walletManager, contentContractManager);
     }
 
     private void LoadUXML() {
@@ -182,67 +174,10 @@ public class RawrshakMenu : EditorWindow
             }
             case "wallet-button":
             default: {
-                LoadWalletPage();
+                walletManager.LoadUI(rootVisualElement);
                 break;
             }
         }
-    }
-
-    private void LoadWalletPage() {
-        var publicKeyLabel = rootVisualElement.Query<Label>("public-key-label").First();
-        var loadWalletButton = rootVisualElement.Query<Button>("load-wallet-button").First();
-        var privateKeyTextField = rootVisualElement.Query<TextField>("private-key-field").First();
-        var qrCode = rootVisualElement.Query<Image>("wallet-connect-qrcode").First();
-        var walletConnectButton = rootVisualElement.Query<Button>("connect-wallet-button").First();
-        var keystoreLocation = rootVisualElement.Query<TextField>("keystore-location").First();
-        var password = rootVisualElement.Query<TextField>("password").First();
-        var newPassword = rootVisualElement.Query<TextField>("new-password").First();
-        var keystoreLoadButton = rootVisualElement.Query<Button>("load-keystore-wallet-button").First();
-
-        // Reset public key
-        publicKeyLabel.text = String.Format("Wallet Address: {0}", wallet.publicKey);
-
-        // Set Password field settings
-        password.isPasswordField = true;
-        password.maskChar = '*';
-        newPassword.isPasswordField = true;
-        newPassword.maskChar = '*';
-        
-        // Load Keystore 
-        keystoreLocation.value = wallet.keyStoreLocation;
-        keystoreLoadButton.clicked += () => {
-            if (String.IsNullOrEmpty(password.value) || String.IsNullOrEmpty(keystoreLocation.value)) {
-                Debug.Log("shit is null");
-                OnWalletLoadError("Error: Empty Keystore location or password.");
-                return;
-            }
-            var pword = password.value;
-            password.value = "";
-            if (keystoreLocation.value != wallet.keyStoreLocation) {
-                wallet.keyStoreLocation = keystoreLocation.value;
-            }
-            wallet.LoadWalletFromKeyStore(pword);
-        };
-
-        // Set up Load Wallet and Save to file Button
-        loadWalletButton.clicked += () => {
-            if (String.IsNullOrEmpty(newPassword.value)) {
-                OnWalletLoadError("Error: Password cannot be empty.");
-                return;
-            }
-            wallet.LoadWalletFromPrivateKey(privateKeyTextField.value);
-            wallet.SaveWalletToFile(newPassword.value);
-            privateKeyTextField.value = "";
-            newPassword.value = "";
-        };
-
-        // Set up Wallet Connect
-        qrCode.image = wallet.qrCodeTexture;
-        walletConnectButton.clicked += async () => {
-            Debug.Log("Waiting for WalletConnect...");
-            await wallet.LoadWalletFromWalletConnect();
-            Debug.Log("Wallet Connected!");
-        };
     }
 
     private void LoadContractPage() {
@@ -300,25 +235,4 @@ public class RawrshakMenu : EditorWindow
         assetBundleManager.RefreshUploadedAssetBundlesBox();
     }
 
-    private void OnWalletLoad() {
-        // Clear Helpbox
-        var helpboxHolder = rootVisualElement.Query<Box>("helpbox-holder").First();
-        helpboxHolder.Clear();
-
-        // Update Wallet
-        var publicKeyLabel = rootVisualElement.Query<Label>("public-key-label").First();
-        publicKeyLabel.text = String.Format("Wallet Address: {0}", wallet.publicKey);
-        Debug.Log("Wallet Loaded!");
-
-        // Refresh UI
-        Repaint();
-    }
-
-    private void OnWalletLoadError(string e) {
-        // Add Error Helpbox
-        var helpboxHolder = rootVisualElement.Query<Box>("helpbox-holder").First();
-        HelpBox helpbox = new HelpBox(e, HelpBoxMessageType.Error);
-        helpboxHolder.Clear();
-        helpboxHolder.Add(helpbox);
-    }
 }

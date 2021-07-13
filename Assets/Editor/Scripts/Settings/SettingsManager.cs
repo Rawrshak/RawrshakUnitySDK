@@ -34,7 +34,7 @@ public class SettingsManager : ScriptableObject
             AssetDatabase.CreateAsset(mRawrshakSettings, "Assets/Editor/Resources/Settings/RawrshakSettings.asset");
         }
         
-        // Load Rawrshak Settings (and Initialize if necessary)
+        // Load Ethereum Settings (and Initialize if necessary)
         mEthereumSettings = Resources.Load<EthereumSettings>("EthereumSettings");
         if (mEthereumSettings == null)
         {
@@ -43,7 +43,7 @@ public class SettingsManager : ScriptableObject
             AssetDatabase.CreateAsset(mEthereumSettings, "Assets/Editor/Resources/Settings/EthereumSettings.asset");
         }
         
-        // Load Rawrshak Settings (and Initialize if necessary)
+        // Load GraphNode Settings (and Initialize if necessary)
         mGraphNodeSettings = Resources.Load<GraphNodeSettings>("GraphNodeSettings");
         if (mGraphNodeSettings == null)
         {
@@ -52,7 +52,7 @@ public class SettingsManager : ScriptableObject
             AssetDatabase.CreateAsset(mGraphNodeSettings, "Assets/Editor/Resources/Settings/GraphNodeSettings.asset");
         }
         
-        // Load Rawrshak Settings (and Initialize if necessary)
+        // Load Arweave Settings (and Initialize if necessary)
         mArweaveSettings = Resources.Load<ArweaveSettings>("ArweaveSettings");
         if (mArweaveSettings == null)
         {

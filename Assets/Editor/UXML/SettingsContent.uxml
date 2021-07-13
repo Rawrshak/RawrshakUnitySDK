@@ -17,6 +17,7 @@
         <engine:Foldout class="foldout-style" name="rawrshak-settings" text="Rawrshak">
             <engine:TextField name="asset-bundle-folder" label="Asset Bundle Folder" binding-path="assetBundleFolder" />
             <editor:EnumField name="build-target" label="Build Target" binding-path="buildTarget" />
+            <engine:TextField name="keystore-location" label="Wallet KeyStore Location" binding-path="defaultKeystoreLocation" />
         </engine:Foldout>
     
         <engine:Foldout class="foldout-style" name="ethereum-settings" text="Ethereum">

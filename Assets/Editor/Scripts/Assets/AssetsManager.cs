@@ -18,7 +18,7 @@ public class AssetsManager : ScriptableObject
     public Button mDeployAssetsButton;
     public AssetData mSelected;
 
-    public Wallet mWallet;
+    public WalletManager mWallet;
     public ContentContractManager mContentContractManager;
 
     // Private UXML
@@ -31,7 +31,7 @@ public class AssetsManager : ScriptableObject
     // Data
     private List<AssetData> mAssetDataList;
 
-    public void Init(Wallet wallet, ContentContractManager contentContractManager)
+    public void Init(WalletManager wallet, ContentContractManager contentContractManager)
     {
         mContentContractManager = contentContractManager;
         mWallet = wallet;
@@ -83,14 +83,14 @@ public class AssetsManager : ScriptableObject
             mContentContractLabel.text = "Current Content Contract Selected: " + mContentContractManager.mSelected.mName;
         }
 
-        if (String.IsNullOrEmpty(mWallet.publicKey))
+        if (String.IsNullOrEmpty(mWallet.GetPublicKey()))
         {
             HelpBox helpbox = new HelpBox("Load a wallet in the Wallet tab.", HelpBoxMessageType.Error);
             mHelpBoxHolder.Add(helpbox);
         }
         else
         {
-            mWalletLabel.text = "Current Wallet Loaded: " + mWallet.publicKey;
+            mWalletLabel.text = "Current Wallet Loaded: " + mWallet.GetPublicKey();
         }
 
         mGenerateAssetButton.clicked += () => {

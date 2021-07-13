@@ -10,7 +10,7 @@ using UnityEditor.UIElements;
 public class ContentContractManager : ScriptableObject
 {
     public RawrshakSettings mSettings;
-    public Wallet mWallet;
+    public WalletManager mWallet;
     public Box mContractEntriesBox;
     public Box mContentContractInfoBox;
     public Label mWalletLabel;
@@ -27,7 +27,7 @@ public class ContentContractManager : ScriptableObject
     // Data
     private List<ContentContract> mContentContracts;
 
-    public void Init(Wallet wallet, RawrshakSettings settings)
+    public void Init(WalletManager wallet, RawrshakSettings settings)
     {
         mSettings = settings;
         mWallet = wallet;
@@ -65,7 +65,7 @@ public class ContentContractManager : ScriptableObject
 
     public void LoadContentContractUI()
     {
-        mWalletLabel.text = "Current Wallet Loaded: " + mWallet.publicKey;
+        mWalletLabel.text = "Current Wallet Loaded: " + mWallet.GetPublicKey();
 
         mGenerateContractButton.clicked += () => {
             GenerateContract();
@@ -78,7 +78,7 @@ public class ContentContractManager : ScriptableObject
     private void GenerateContract()
     {
         ContentContract contract = ScriptableObject.CreateInstance<ContentContract>();
-        contract.Init(mSettings.developerName, mWallet.publicKey);
+        contract.Init(mSettings.developerName, mWallet.GetPublicKey());
         mContentContracts.Add(contract);
         
         CreateContentContractFile(contract);

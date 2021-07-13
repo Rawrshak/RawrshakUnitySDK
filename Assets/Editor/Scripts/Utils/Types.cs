@@ -2,6 +2,12 @@ using UnityEngine;
 
 namespace Rawrshak {
 
+    public enum WalletType {
+        None,
+        PrivateWallet,
+        WalletConnect
+    };
+    
     public enum EthereumNetwork {
         Mainnet,
         Rinkby,
