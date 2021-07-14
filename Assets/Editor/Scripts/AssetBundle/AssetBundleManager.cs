@@ -132,7 +132,7 @@ public class AssetBundleManager : ScriptableObject
 
         var generateAssetBundles = root.Query<Button>("create-asset-bundles-button").First();
         generateAssetBundles.clicked += () => {
-            CreateAssetBundles.BuildAllAssetBundles(mRawrshakSettings.buildTarget);
+            CreateAssetBundles.BuildAllAssetBundles(mRawrshakSettings.buildTarget, mRawrshakSettings.assetBundleFolder);
             Refresh();
         };
 

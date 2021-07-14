@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 using Rawrshak;
+using System;
 using System.IO;
 
 public class SettingsManager : ScriptableObject
@@ -12,6 +13,8 @@ public class SettingsManager : ScriptableObject
     public EthereumSettings mEthereumSettings;
     public GraphNodeSettings mGraphNodeSettings;
     public RawrshakSettings mRawrshakSettings;
+
+    public WalletManager mWalletManager;
 
     // UI
     private Box mHelpbox;
@@ -93,9 +96,48 @@ public class SettingsManager : ScriptableObject
     }
 
     private void VerifySettings() {
+        mHelpbox.Clear();
+
         // Check if asset bundle folder exists
+        string assetBundleDirectory = "Assets/" + mRawrshakSettings.assetBundleFolder;
+        if(!Directory.Exists(assetBundleDirectory))
+        {
+            Directory.CreateDirectory(assetBundleDirectory);
+        }
+
         // Check if we can connect to ethereum 
+        if (mWalletManager)
+        {
+            CheckEthereumConnection();
+        }
+
         // check if we can connect to arweave
         // check if we can connect to the graph node
+    }
+
+    private async void CheckEthereumConnection()
+    {
+        if (mWalletManager.mWeb3 == null)
+        {
+            AddErrorHelpbox("Error: Web3 Connection has not been established.");
+            return;
+        }
+
+        try
+        {
+            await mWalletManager.mWeb3.Eth.Blocks.GetBlockNumber.SendRequestAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Web3 Error: " + ex.Message);
+            AddErrorHelpbox(ex.Message);
+            return;
+        }
+        mHelpbox.Add(new HelpBox("Verified Ethereum Connection", HelpBoxMessageType.Info));
+    }
+
+    private void AddErrorHelpbox(string errorMsg)
+    {
+        mHelpbox.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
     }
 }

@@ -5,6 +5,7 @@ using UnityEditor.UIElements;
 using Rawrshak;
 using UnityEngine.Events;
 using System;
+using Nethereum.Web3;
 
 public class WalletManager : ScriptableObject
 {
@@ -17,18 +18,20 @@ public class WalletManager : ScriptableObject
     private PrivateWalletManager mPrivateWalletManager;
 
     private RawrshakSettings mRawrshakSettings;
+    private EthereumSettings mEthereumSettings;
 
     // Web3 
-    // public Web3 web3;
+    public Web3 mWeb3;
 
     // UI
     private Box mHelpbox;
     private Label mPublicKeyLabel;
     private UnityEvent RepaintUI = new UnityEvent();
     
-    public void Init(RawrshakSettings rawrshakSettings, UnityAction repaintUI)
+    public void Init(RawrshakSettings rawrshakSettings, EthereumSettings ethereumSettings, UnityAction repaintUI)
     {
         mRawrshakSettings = rawrshakSettings;
+        mEthereumSettings = ethereumSettings;
         RepaintUI.AddListener(repaintUI);
         mPublicKey = String.Empty;
         mWalletType = WalletType.None;
@@ -76,17 +79,36 @@ public class WalletManager : ScriptableObject
         return mPublicKey;
     }
     
-    private void OnWalletLoad(WalletType newWalletType)
+    private async void OnWalletLoad(WalletType newWalletType)
     {
         // Set Loaded wallet type
         mWalletType = newWalletType;
         if (mWalletType == WalletType.PrivateWallet)
         {
             mPublicKey = mPrivateWalletManager.GetPublicKey();
+            mWeb3 = mPrivateWalletManager.GetWeb3(mEthereumSettings.GetEthereumUrl());
         }
         else
         {
             mPublicKey = mWalletConnectManager.GetPublicKey();
+            mWeb3 = mWalletConnectManager.GetWeb3(mEthereumSettings.GetEthereumUrl());
+        }
+
+        // Verify that the Web3 connection works
+        if (mWeb3 != null)
+        {
+            try
+            {
+                Debug.Log("Web3 is created");
+                var blockNumber = await mWeb3.Eth.Blocks.GetBlockNumber.SendRequestAsync();
+                Debug.Log("Current Block Number: " + blockNumber.Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("Web3 Error: " + ex.Message);
+                OnWalletLoadError(ex.Message);
+                return;
+            }
         }
 
         // Clear Helpbox
@@ -106,5 +128,8 @@ public class WalletManager : ScriptableObject
         HelpBox helpbox = new HelpBox(errorMsg, HelpBoxMessageType.Error);
         mHelpbox.Clear();
         mHelpbox.Add(helpbox);
+        
+        // Refresh UI
+        RepaintUI.Invoke();
     }
 }

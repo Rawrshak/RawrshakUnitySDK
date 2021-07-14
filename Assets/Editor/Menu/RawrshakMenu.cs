@@ -60,8 +60,9 @@ public class RawrshakMenu : EditorWindow
         if (walletManager == null)
         {
             walletManager = ScriptableObject.CreateInstance<WalletManager>();
-            walletManager.Init(settingsManager.mRawrshakSettings, () => { this.Repaint(); });
+            walletManager.Init(settingsManager.mRawrshakSettings, settingsManager.mEthereumSettings, () => { this.Repaint(); });
         }
+        settingsManager.mWalletManager = walletManager;
 
         assetBundleManager = ScriptableObject.CreateInstance<AssetBundleManager>();
         assetBundleManager.Init(settingsManager.mRawrshakSettings);

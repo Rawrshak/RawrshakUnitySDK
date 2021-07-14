@@ -14,6 +14,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Rawrshak;
+using Nethereum.Web3;
+using Nethereum.JsonRpc.Client;
 
 public class WalletConnectManager : ScriptableObject {
     
@@ -103,11 +105,24 @@ public class WalletConnectManager : ScriptableObject {
 
         // Todo: uncomment this
         // When connecting with Nethereum: <replace infura URI with ethereum url>
-        // var web3 = new Web3(walletConnect.CreateProvider(new Uri("https://mainnet.infura.io/v3/<infruaId>"));
     }
 
     public string GetPublicKey()
     {
         return mPublicKey;
+    }
+
+    public Web3 GetWeb3(string uri)
+    {
+        // Bug: This currently fails with the following compiler error
+        //      error CS0012: The type 'IClient' is defined in an assembly that is 
+        //      not referenced. You must add a reference to assembly 'Nethereum.JsonRpc.Client,
+        //      Version=3.8.0.0, Culture=neutral, PublicKeyToken=8768a594786aba4e'.
+        // For some reason, it doesn't like Nethereum.JsonRpc.Client that has the PublicKeyToken 
+        // equal to null.
+        
+        // "https://mainnet.infura.io/v3/<infruaId>"
+        // return new Web3(mWalletConnect.CreateProvider(new Uri(uri)));
+        return null;
     }
 }

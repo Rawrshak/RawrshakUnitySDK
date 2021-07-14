@@ -143,4 +143,9 @@ public class PrivateWalletManager : ScriptableObject {
             onWalletLoadError.Invoke(ex.Message);
         }
     }
+
+    public Web3 GetWeb3(string uri)
+    {
+        return new Web3(mAccount, uri);
+    }
 }

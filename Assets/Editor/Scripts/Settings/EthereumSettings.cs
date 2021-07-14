@@ -22,4 +22,9 @@ public class EthereumSettings : ScriptableObject
         port = 8545;
         askForPasswordAtEveryTransaction = true;
     }
+
+    public string GetEthereumUrl()
+    {
+        return String.Format("{0}:{1}", ethereumGatewayUri, port);
+    }
 }

@@ -14,31 +14,26 @@ Note: Asset bundles are backward compatible but not forward compatible.
 # Todo:
 1. Rawrshak Menu
     - Wallet Tab
-        - Import private key or connect via WalletConnect
+        - Connect to Ethereum
     - Settings Tab
-        - Ability to set all Rawrshak Setting requirements
-        - This includes connection settings:
-            - Rawrshak Subgraph
-            - Ethereum (mainnet, testnets, or subnets)
-            - Arweave (connection and wallet)
+        - Verify Settings
     - Content Contract Tab
+        - Add Smart Contract ABI
+        - Deploy Metadata to Arweave
         - deploy a content contract
         - manage wallet roles
-        - select content contract in use
+        - update contract metadata
     - Asset Viewer Tab
-        - list all assets in content contract
-        - set up new assets and deploy to content contract
-        - upload metadata to permanent storage (Arweave)
-        - Verify assets are loadable before uploading
+        - Query GraphQL for all assets attached to selected content contract
+        - Deploy Asset Metadata (hidden and not hidden)
+        - Set/Update metadata
     - AssetBundle Tab
-        - Generate asset bundles
+        - Verify AssetBundles can be loaded first
         - Upload asset bundles to arweave
-        - Verify Asset bundles usable
-2. Install the following:
-    - Nethereum
-    - Python
-    - Arweave Python Client
+        - Verify Asset bundles usable after uploaded
+2. Verify Connection to:
+    - Ethereum
+    - Arweave
     - GraphQL
-    - WalletConnect
 
 

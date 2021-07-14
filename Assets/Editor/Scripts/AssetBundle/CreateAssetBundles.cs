@@ -5,14 +5,14 @@ using UnityEngine;
 
 public class CreateAssetBundles
 {
-    public static void BuildAllAssetBundles(SupportedBuildTargets buildTarget)
+    public static void BuildAllAssetBundles(SupportedBuildTargets buildTarget, string assetBundleDirectory)
     {
-        string assetBundleDirectory = "Assets/AssetBundles";
-        if(!Directory.Exists(assetBundleDirectory))
+        string directory = "Assets/" + assetBundleDirectory;
+        if(!Directory.Exists(directory))
         {
-            Directory.CreateDirectory(assetBundleDirectory);
+            Directory.CreateDirectory(directory);
         }
-        BuildPipeline.BuildAssetBundles(assetBundleDirectory, 
+        BuildPipeline.BuildAssetBundles(directory, 
                                         BuildAssetBundleOptions.None, 
                                         ConvertToBuildTarget(buildTarget));
     }
