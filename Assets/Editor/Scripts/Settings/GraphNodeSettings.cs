@@ -3,12 +3,15 @@ using UnityEditor;
 using System;
 using System.Collections.Generic;
 
-public class GraphNodeSettings : ScriptableObject
-{
-    public string graphNodeUri;
-
-    public void Init()
+namespace Rawrshak
+{  
+    public class GraphNodeSettings : ScriptableObject
     {
-        graphNodeUri = "http://localhost:8000/subgraphs/name/gcbsumid/";
+        public string graphNodeUri;
+
+        public void Init()
+        {
+            graphNodeUri = "http://localhost:8000/subgraphs/name/gcbsumid/";
+        }
     }
 }

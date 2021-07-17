@@ -3,14 +3,17 @@ using UnityEditor;
 using System;
 using System.Collections.Generic;
 
-public class ArweaveSettings : ScriptableObject
+namespace Rawrshak
 {
-    public string arweaveGatewayUri;
-    public string arweaveWalletFile;
-
-    public void Init()
+    public class ArweaveSettings : ScriptableObject
     {
-        arweaveGatewayUri = "http://arweave.net";
-        arweaveWalletFile = "/Asset/WalletFile";
+        public string arweaveGatewayUri;
+        public string arweaveWalletFile;
+
+        public void Init()
+        {
+            arweaveGatewayUri = "http://arweave.net";
+            arweaveWalletFile = "/Asset/WalletFile";
+        }
     }
 }
