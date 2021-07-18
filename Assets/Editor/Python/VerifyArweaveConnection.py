@@ -27,13 +27,15 @@ if arweaveSettings == None:
     quit()
 
 try:
-    wallet_file_path = "C://Users//gcbsu//Rawrshak//Arweave//keys//arweave-key-tAVRSXLB4L4bhZIs7BX8K4OitRXv26JjqdYCMKT-aJE.json"
+    wallet_file_path = arweaveSettings.arweaveWalletFile
+    # print(wallet_file_path)
     wallet = arweave.Wallet(wallet_file_path)
     # wallet.api_url = "http://localhost:1984"
     wallet.api_url = arweaveSettings.arweaveGatewayUri
     # print(wallet.api_url)
     # print(wallet.address)
-    settingsManager.AddErrorHelpbox(wallet.address)
+    arweaveSettings.wallet = wallet.address
+    # settingsManager.AddErrorHelpbox(wallet.address)
     print(str(wallet.balance))
 except ArweaveTransactionException as ae:
     print(ae.message)

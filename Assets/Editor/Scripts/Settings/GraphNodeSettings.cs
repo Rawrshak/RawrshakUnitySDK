@@ -11,6 +11,7 @@ namespace Rawrshak
 
         public void Init()
         {
+            Debug.Log("Initializing GraphNodeSettings.");
             graphNodeUri = "http://localhost:8000/subgraphs/name/gcbsumid/";
         }
     }

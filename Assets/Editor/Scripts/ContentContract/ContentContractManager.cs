@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
+
 namespace Rawrshak
 {
     public class ContentContractManager : ScriptableObject

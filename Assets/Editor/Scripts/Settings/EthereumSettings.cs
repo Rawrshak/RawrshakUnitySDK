@@ -17,6 +17,7 @@ namespace Rawrshak
         public bool askForPasswordAtEveryTransaction;
         public void Init()
         {
+            Debug.Log("Initializing EthereumSettings.");
             ethereumGatewayUri = "http://localhost";
             networkId = EthereumNetwork.Localhost;
             defaultGasPrice = 20;

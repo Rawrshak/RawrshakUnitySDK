@@ -33,6 +33,10 @@
         </engine:Foldout>
         
         <engine:Foldout class="foldout-style" name="arweave-settings" text="Arweave">
+            <engine:Box style="flex-direction: Row;" >
+                <engine:Label text="Loaded Arweave Wallet: " />
+                <engine:Label name="loaded-arweave-wallet-label" binding-path="wallet" />
+            </engine:Box>
             <engine:TextField name="arweave-uri" label="Arweave Gateway URI" binding-path="arweaveGatewayUri" />
             <engine:TextField name="arweave-wallet-file" label="Wallet File Location" binding-path="arweaveWalletFile" />
         </engine:Foldout>

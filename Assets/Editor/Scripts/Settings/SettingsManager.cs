@@ -24,6 +24,8 @@ namespace Rawrshak
 
         public void Init()
         {
+            Debug.Log("Initializing SettingsManager.");
+
             // Create Settings folder if necessary
             string settingsDirectory = "Assets/Editor/Resources/Settings";
             if(!Directory.Exists(settingsDirectory))
@@ -62,6 +64,7 @@ namespace Rawrshak
             mArweaveSettings = Resources.Load<ArweaveSettings>("ArweaveSettings");
             if (mArweaveSettings == null)
             {
+                Debug.Log("Arweave Settings is null. Generating new file");
                 mArweaveSettings = ScriptableObject.CreateInstance<ArweaveSettings>();
                 mArweaveSettings.Init();
                 AssetDatabase.CreateAsset(mArweaveSettings, "Assets/Editor/Resources/Settings/ArweaveSettings.asset");
@@ -117,7 +120,7 @@ namespace Rawrshak
             // check if we can connect to arweave
             if (mArweaveSettings)
             {
-                PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/VerifyArweaveConnection.py");
+                mArweaveSettings.LoadWallet();
             }
 
             // check if we can connect to the graph node

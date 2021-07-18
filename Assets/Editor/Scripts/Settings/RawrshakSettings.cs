@@ -15,6 +15,7 @@ namespace Rawrshak
 
         public void Init()
         {
+            Debug.Log("Initializing RawrshakSettings.");
             developerName = "Default Developer";
             assetBundleFolder = "AssetBundles";
             defaultKeystoreLocation = "Assets/Editor/Resources/Keystore/WalletKeyStore.json";

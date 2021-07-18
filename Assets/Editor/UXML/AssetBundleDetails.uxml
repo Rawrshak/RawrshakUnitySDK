@@ -5,7 +5,7 @@
     xmlns:editor="UnityEditor.UIElements"
     xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
 >
-    <engine:Box style="font-size: 12px;" >
+    <engine:Box style="font-size: 14px;" >
         <engine:TextField name="name" label="Name" enabledSelf="false" />
         <engine:TextField name="hash" label="Hash Id" enabledSelf="false" />
         <engine:TextField name="transaction-id" label="Transaction Id" enabledSelf="false" />
