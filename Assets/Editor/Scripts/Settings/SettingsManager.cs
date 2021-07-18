@@ -34,7 +34,7 @@ namespace Rawrshak
             }
 
             // Load Rawrshak Settings (and Initialize if necessary)
-            mRawrshakSettings = Resources.Load<RawrshakSettings>("RawrshakSettings");
+            mRawrshakSettings = Resources.Load<RawrshakSettings>("Settings/RawrshakSettings");
             if (mRawrshakSettings == null)
             {
                 mRawrshakSettings = ScriptableObject.CreateInstance<RawrshakSettings>();
@@ -43,7 +43,7 @@ namespace Rawrshak
             }
             
             // Load Ethereum Settings (and Initialize if necessary)
-            mEthereumSettings = Resources.Load<EthereumSettings>("EthereumSettings");
+            mEthereumSettings = Resources.Load<EthereumSettings>("Settings/EthereumSettings");
             if (mEthereumSettings == null)
             {
                 mEthereumSettings = ScriptableObject.CreateInstance<EthereumSettings>();
@@ -52,7 +52,7 @@ namespace Rawrshak
             }
             
             // Load GraphNode Settings (and Initialize if necessary)
-            mGraphNodeSettings = Resources.Load<GraphNodeSettings>("GraphNodeSettings");
+            mGraphNodeSettings = Resources.Load<GraphNodeSettings>("Settings/GraphNodeSettings");
             if (mGraphNodeSettings == null)
             {
                 mGraphNodeSettings = ScriptableObject.CreateInstance<GraphNodeSettings>();
@@ -61,7 +61,7 @@ namespace Rawrshak
             }
             
             // Load Arweave Settings (and Initialize if necessary)
-            mArweaveSettings = Resources.Load<ArweaveSettings>("ArweaveSettings");
+            mArweaveSettings = Resources.Load<ArweaveSettings>("Settings/ArweaveSettings");
             if (mArweaveSettings == null)
             {
                 Debug.Log("Arweave Settings is null. Generating new file");
@@ -123,7 +123,7 @@ namespace Rawrshak
                 mArweaveSettings.LoadWallet();
             }
 
-            // check if we can connect to the graph node
+            // Todo: Check if we can connect to the graph node
         }
 
         private async void CheckEthereumConnection()

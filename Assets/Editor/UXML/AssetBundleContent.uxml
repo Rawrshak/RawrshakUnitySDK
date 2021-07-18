@@ -13,6 +13,18 @@
 
     <!-- <engine:Label class="section-header" name="new-asset-bundles-header" text="New Asset Bundles" style="font-size: 14px;"/> -->
     
+    <engine:Box name="wallet-info" style="font-size: 14px;" >
+        <engine:Box style="flex-direction: Row;" >
+            <engine:Label text="Loaded Arweave Wallet: " />
+            <engine:Label binding-path="wallet" />
+        </engine:Box>
+        <engine:Box style="flex-direction: Row;" >
+            <engine:Label text="Wallet Balance: " />
+            <engine:Label binding-path="walletBalance" />
+        </engine:Box>
+    </engine:Box>
+    <engine:Button name="refresh-balance" text="Refresh Balance" />
+
     <engine:Foldout class="foldout-style" name="new-asset-bundles-section" text="New Asset Bundles">
         <engine:ScrollView >
             <engine:Box style="flex-direction: Row;" >

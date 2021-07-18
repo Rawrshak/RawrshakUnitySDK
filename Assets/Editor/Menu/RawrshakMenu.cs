@@ -66,7 +66,7 @@ namespace Rawrshak
             settingsManager.mWalletManager = walletManager;
 
             assetBundleManager = ScriptableObject.CreateInstance<AssetBundleManager>();
-            assetBundleManager.Init(settingsManager.mRawrshakSettings);
+            assetBundleManager.Init(settingsManager.mRawrshakSettings, settingsManager.mArweaveSettings);
 
             contentContractManager = ScriptableObject.CreateInstance<ContentContractManager>();
             contentContractManager.Init(walletManager, settingsManager.mRawrshakSettings);

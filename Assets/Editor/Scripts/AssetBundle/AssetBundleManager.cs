@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
+using UnityEditor.UIElements;
 using System.IO;
 
 namespace Rawrshak
@@ -22,14 +23,16 @@ namespace Rawrshak
         private Box mAssetBundleEntries;
         private Box mUploadedAsssetBundleEntries;
         private Box mAssetBundleInfoBox;
-        private Box mHelpBox;
+        private Box mHelpBoxHolder;
 
         private RawrshakSettings mRawrshakSettings;
+        public ArweaveSettings mArweaveSettings;
         Dictionary<string, AssetBundleData> mNewAssetBundles;
 
-        public void Init(RawrshakSettings rawrshakSettings)
+        public void Init(RawrshakSettings rawrshakSettings, ArweaveSettings arweaveSettings)
         {
             mRawrshakSettings = rawrshakSettings;
+            mArweaveSettings = arweaveSettings;
             mAssetBundlePath = Application.dataPath + "/" + mRawrshakSettings.assetBundleFolder;
             mNewAssetBundles = new Dictionary<string, AssetBundleData>();
             mAssetBundlesInfoLocation = "Assets/Editor/Resources/AssetBundlesInfo.json";
@@ -72,6 +75,9 @@ namespace Rawrshak
             // clear all entries first
             mAssetBundleEntries.Clear();
             mNewAssetBundles.Clear();
+
+            // Clear helper box
+            mHelpBoxHolder.Clear();
 
             // Load Entry UML
             var entry = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/NewAssetBundleEntry.uxml");
@@ -130,12 +136,21 @@ namespace Rawrshak
         
         public void LoadUI(VisualElement root)
         {
-            mHelpBox = root.Query<Box>("helpbox-holder").First();
+            mHelpBoxHolder = root.Query<Box>("helpbox-holder").First();
 
             var generateAssetBundles = root.Query<Button>("create-asset-bundles-button").First();
             generateAssetBundles.clicked += () => {
                 CreateAssetBundles.BuildAllAssetBundles(mRawrshakSettings.buildTarget, mRawrshakSettings.assetBundleFolder);
                 Refresh();
+            };
+
+            var walletInfoBox = root.Query<Box>("wallet-info").First();
+            SerializedObject so = new SerializedObject(mArweaveSettings);
+            walletInfoBox.Bind(so);
+
+            var refreshBalanceButton = root.Query<Button>("refresh-balance").First();
+            refreshBalanceButton.clicked += () => {
+                mArweaveSettings.RefreshBalance();
             };
 
             mAssetBundleEntries = root.Query<Box>("asset-bundle-entries").First();
@@ -159,6 +174,12 @@ namespace Rawrshak
             // Refresh some UI
             Refresh();
             RefreshUploadedAssetBundlesBox();
+
+            if (String.IsNullOrEmpty(mArweaveSettings.wallet))
+            {
+                HelpBox helpbox = new HelpBox("Load an Arweave Wallet in the Settings tab.", HelpBoxMessageType.Error);
+                mHelpBoxHolder.Add(helpbox);
+            }
         }
 
         public void UploadAssetBundles()
@@ -288,6 +309,11 @@ namespace Rawrshak
             writer.WriteLine(data);
             writer.Close();
             AssetDatabase.Refresh();
+        }
+
+        public void AddErrorHelpbox(string errorMsg)
+        {
+            mHelpBoxHolder.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
         }
     }
 

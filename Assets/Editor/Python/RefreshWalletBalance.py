@@ -10,34 +10,33 @@ from arweave.arweave_lib import ArweaveTransactionException
 clr.AddReference('Rawrshak')
 import UnityEngine
 from Rawrshak import ArweaveSettings
-from Rawrshak import SettingsManager
+from Rawrshak import AssetBundleManager
 
 arweaveSettings = None
 settingsManager = None
 
-# arweaveSettings = UnityEngine.Object.FindObjectOfType(ArweaveSettings)
-settingsManager = UnityEngine.Object.FindObjectOfType(SettingsManager)
+assetBundleManager = UnityEngine.Object.FindObjectOfType(AssetBundleManager)
 
-if settingsManager == None:
-    settingsManager.AddErrorHelpbox("No Settings Manager Found.")
+if assetBundleManager == None:
+    print("Error: No Asset Bundle Manager Found.")
     quit()
 
-arweaveSettings = settingsManager.mArweaveSettings  
+arweaveSettings = assetBundleManager.mArweaveSettings
 
 if arweaveSettings == None:
-    settingsManager.AddErrorHelpbox("No Arweave Settings Found.")
+    assetBundleManager.AddErrorHelpbox("No Arweave Settings Found.")
     quit()
 
 try:
     wallet = arweave.Wallet(arweaveSettings.arweaveWalletFile)
     wallet.api_url = arweaveSettings.arweaveGatewayUri
-    arweaveSettings.wallet = wallet.address
+    print(ar_to_winston(wallet.balance))
     arweaveSettings.walletBalance = ar_to_winston(wallet.balance)
 except ArweaveTransactionException as ae:
     print(ae.message)
-    settingsManager.AddErrorHelpbox(ae.message)
+    assetBundleManager.AddErrorHelpbox(ae.message)
 except Exception as e:
     # print("Error ", e.__class__, ", [Cause]: ", e.msg)
     # print(e.__class__)
     # print(sys.exc_info())
-    settingsManager.AddErrorHelpbox(str(sys.exc_info()[0]) + "\n" + str(sys.exc_info()[1]))
+    assetBundleManager.AddErrorHelpbox(str(sys.exc_info()[0]) + "\n" + str(sys.exc_info()[1]))
