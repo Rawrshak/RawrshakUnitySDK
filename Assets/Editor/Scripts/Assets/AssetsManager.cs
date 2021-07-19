@@ -44,7 +44,7 @@ namespace Rawrshak
             }
 
             // Load all Assets in Resources/Assets
-            foreach (AssetData asset in Resources.FindObjectsOfTypeAll(typeof(AssetData)) as AssetData[])
+            foreach (AssetData asset in Resources.LoadAll("Assets", typeof(AssetData)))
             {
                 // Only Load assets that are stored
                 if (EditorUtility.IsPersistent(asset))
@@ -203,7 +203,7 @@ namespace Rawrshak
 
         private void CreateAssetFile(AssetData asset)
         {
-            string fileName = String.Format("{0}/Contract_{1}.asset", sAssetsFileLocation, asset.GetInstanceID());
+            string fileName = String.Format("{0}/Asset_{1}.asset", sAssetsFileLocation, asset.GetInstanceID());
             AssetDatabase.CreateAsset(asset, fileName);
             AssetDatabase.SaveAssets();
         }

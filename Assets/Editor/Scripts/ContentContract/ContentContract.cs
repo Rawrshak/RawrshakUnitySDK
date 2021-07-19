@@ -50,7 +50,7 @@ namespace Rawrshak
     public class WalletWithRoles
     {
         public string mAddress;
-        [EnumFlag]
+        // [EnumFlag]
         public Role mRole;
     }
 }

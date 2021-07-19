@@ -41,7 +41,7 @@ namespace Rawrshak
             }
 
             // Load all Content Contracts in Resources/ContentContracts
-            foreach (ContentContract contract in Resources.FindObjectsOfTypeAll(typeof(ContentContract)) as ContentContract[])
+            foreach (ContentContract contract in Resources.LoadAll("ContentContracts", typeof(ContentContract)))
             {
                 // Only Load contracts that are stored
                 if (EditorUtility.IsPersistent(contract))
