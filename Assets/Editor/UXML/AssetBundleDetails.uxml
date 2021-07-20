@@ -5,12 +5,14 @@
     xmlns:editor="UnityEditor.UIElements"
     xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
 >
-    <engine:Box style="font-size: 14px;" >
+    <engine:Box name="info-box" style="font-size: 14px;" >
         <engine:TextField name="name" label="Name" enabledSelf="false" />
         <engine:TextField name="hash" label="Hash Id" enabledSelf="false" />
         <engine:TextField name="transaction-id" label="Transaction Id" enabledSelf="false" />
         <engine:TextField name="uri" label="Uri" enabledSelf="false" />
         <engine:TextField name="uploaded-timestamp" label="Upload Timestamp" enabledSelf="false" />
+        <engine:TextField name="status" label="Status" binding-path="mStatus" />
+        <engine:Button name="check-status" text="Check Status" />
     </engine:Box> 
     
 </engine:UXML>

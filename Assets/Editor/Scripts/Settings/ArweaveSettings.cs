@@ -16,6 +16,8 @@ namespace Rawrshak
         public string wallet;
         public string walletBalance;
 
+        public AssetBundleData bundleForUpload;
+
         public void Init()
         {
             Debug.Log("Initializing ArweaveSettings.");
@@ -25,6 +27,7 @@ namespace Rawrshak
             walletBalance = "0.0";
         }
         
+        // Todo: Create an Arweave Manager to do all of these.
         public void LoadWallet()
         {
             PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/VerifyArweaveConnection.py");
@@ -33,6 +36,16 @@ namespace Rawrshak
         public void RefreshBalance()
         {
             PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/RefreshWalletBalance.py");
+        }
+
+        public void UploadAssetBundle()
+        {
+            PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/UploadAssetBundle.py");
+        }
+
+        public void CheckStatus()
+        {
+            PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/CheckStatus.py");
         }
     }
 }

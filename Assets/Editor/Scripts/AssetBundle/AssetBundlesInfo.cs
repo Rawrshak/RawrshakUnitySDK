@@ -53,21 +53,29 @@ namespace Rawrshak
         public string mName;
 
         public bool mSelectedForUploading;
+        public string mStatus;
+        [NonSerialized]
+        public int mNumOfConfirmations;
 
         public string mTransactionId;
         public string mUri;
 
         public string mUploadedTimestamp;
 
-        public AssetBundleData(Hash128 hash, string name)
+        public string mFileLocation;
+
+        public AssetBundleData(Hash128 hash, string name, string fileLocation)
         {
             mHashId = hash;
             mHash = hash.ToString();
             mName = name;
             mSelectedForUploading = false;
-            mTransactionId = "";
-            mUri = "";
+            mTransactionId = String.Empty;
+            mUri = String.Empty;
             mUploadedTimestamp = DateTime.MinValue.ToString();
+            mFileLocation = fileLocation;
+            mStatus = String.Empty;
+            mNumOfConfirmations = 0;
         }
 
         public void FromJSON()

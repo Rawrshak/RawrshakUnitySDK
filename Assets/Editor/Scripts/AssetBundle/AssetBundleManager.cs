@@ -101,7 +101,7 @@ namespace Rawrshak
                 mAssetBundleEntries.Add(entryTree);
 
                 // find or add the asset bundle in the new asset bundle lists
-                AssetBundleData assetBundleData = new AssetBundleData(hash, name);
+                AssetBundleData assetBundleData = new AssetBundleData(hash, name, mAssetBundlePath + "/" + name);
                 mNewAssetBundles.Add(name, assetBundleData);
 
                 // Set Toggle Callback
@@ -129,9 +129,9 @@ namespace Rawrshak
             if (mAssetBundle)
             {
                 mAssetBundle.Unload(true);   
+                SaveAssetBundlesInfo();
             }
             mManifest = null;
-            // SaveAssetBundlesInfo();
         }
         
         public void LoadUI(VisualElement root)
@@ -208,7 +208,9 @@ namespace Rawrshak
                     continue;
                 }
 
-                // Todo: upload to storage
+                // Upload to storage
+                mArweaveSettings.bundleForUpload = bundle;
+                mArweaveSettings.UploadAssetBundle();
 
                 // Remove from new asset bundles list
                 mNewAssetBundles.Remove(uploadIter.Current);
@@ -217,10 +219,10 @@ namespace Rawrshak
                 bundle.mSelectedForUploading = false;
                 bundle.mUploadedTimestamp = DateTime.Now.ToString();
                 
-                // Todo: Update Transaction ID and Transaction URI
-
                 // Add to mAssetBundlesInfo
                 mAssetBundlesInfo.mDictionary.Add(bundle.mHashId, bundle);
+                
+                ViewAssetBundleInfo(bundle);
             }
         }
 
@@ -262,6 +264,7 @@ namespace Rawrshak
             mAssetBundleInfoBox.Clear();
             var entry = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/AssetBundleDetails.uxml");
             TemplateContainer entryTree = entry.CloneTree();
+
             entryTree.contentContainer.Query<TextField>("name").First().value = bundle.mName;
             entryTree.contentContainer.Query<TextField>("name").First().SetEnabled(false);
             entryTree.contentContainer.Query<TextField>("hash").First().value = bundle.mHash;
@@ -272,6 +275,15 @@ namespace Rawrshak
             entryTree.contentContainer.Query<TextField>("uri").First().SetEnabled(false);
             entryTree.contentContainer.Query<TextField>("uploaded-timestamp").First().value = bundle.mUploadedTimestamp;
             entryTree.contentContainer.Query<TextField>("uploaded-timestamp").First().SetEnabled(false);
+            entryTree.contentContainer.Query<TextField>("status").First().value = bundle.mStatus;
+            entryTree.contentContainer.Query<TextField>("status").First().SetEnabled(false);
+
+            var refreshButton = entryTree.contentContainer.Query<Button>("check-status").First();
+            refreshButton.clicked += () => {
+                mArweaveSettings.bundleForUpload = bundle;
+                mArweaveSettings.CheckStatus();
+                ViewAssetBundleInfo(bundle);
+            };
             
             mAssetBundleInfoBox.Add(entryTree);
         }
