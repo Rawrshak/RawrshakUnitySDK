@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:Label text="Public Metadata" />
+    <engine:Box name="metadata-section" >
+        <engine:TextField name="name" label="Asset Name" binding-path="name" />
+        <engine:TextField name="description" multiline="true" label="Description" binding-path="description" />
+        <engine:TextField name="image" label="Image Uri" binding-path="image" />
+        <editor:EnumField name="asset-type" label="Asset Type" binding-path="type" />
+        <editor:EnumField name="asset-subtype" label="Asset Subtype" binding-path="subtype" />
+        <engine:TextField name="deployment-date" label="Deployment Date" binding-path="deploymentDate" />
+        <editor:PropertyField name="localization" label="Localization" binding-path="localization" />
+    </engine:Box >
+</engine:UXML>

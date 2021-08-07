@@ -14,6 +14,8 @@
         <engine:Label name="content-label" text="Current Content Contract Selected: " style="font-size: 14px; margin: 5px 0px;" />
     </engine:Box >
 
+    <editor:EnumField name="asset-type" label="Asset Type" />
+    <editor:EnumField name="asset-subtype" label="Asset Subtype" />
     <engine:Button name="generate-asset-button" text="Generate New Asset" />
 
     <engine:Foldout class="foldout-style" name="asset-list-section" text="Assets">
@@ -28,10 +30,12 @@
         <engine:Button name="deploy-button" text="Deploy Selected Assets" />     
     </engine:Foldout>
 
-    <engine:Box >
+    <engine:ScrollView name="asset-info">
         <engine:Label text="Asset Info" style="font-size: 14px;" />
-        <engine:Box name="asset-info" style="font-size: 14px; margin: 5px;" />
-    </engine:Box> 
+        <engine:Box name="contract-info" style="font-size: 14px; margin: 5px;" />
+        <engine:Box name="public-metadata" style="font-size: 14px; margin: 5px;" />
+        <engine:Box name="private-metadata" style="font-size: 14px; margin: 5px;" />
+    </engine:ScrollView>
 
     <engine:Box name="helpbox-holder" />
 </engine:UXML>

@@ -29,4 +29,31 @@ namespace Rawrshak {
         Minter = 1 << 0,
         Burner = 1 << 1
     };
+
+    public enum AssetType
+    {
+        Text,
+        Image,
+        Audio,
+        Static_Object
+    };
+
+    public enum AssetSubtype
+    {
+        Text_Custom,
+        Text_Title,
+        Text_Lore,
+        Image_Custom,
+        Image_Standard_Texture,
+        Image_Spray,
+        Image_Emblem,
+        Image_Banner,
+        Image_Decal,
+        Audio_Custom,
+        Audio_Sound_Effect,
+        Audio_Voice_Line,
+        Audio_BGM,
+        Static_Object_Custom,
+        Static_Object_Trophy
+    };
 }

@@ -6,9 +6,10 @@
     xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
 >
     <engine:Box name="asset-info-section" >
-        <engine:TextField name="name" label="Asset Name" binding-path="mName" />
-        <editor:IntegerField name="id" label="Id" binding-path="mId" />
-        <engine:TextField name="metadata-uri" label="Metadata Uri" binding-path="mMetadataUri" />
-        <engine:TextField name="hidden-metadata-uri" label="Hidden Metadata Uri" binding-path="mHiddenMetadataUri" />
+        <editor:IntegerField name="id" label="Id" binding-path="tokenId" />
+        <engine:TextField name="public-metadata-uri" label="Public Metadata" binding-path="publicMetadataUri" />
+        <engine:TextField name="private-metadata-uri" label="Private Metadata" binding-path="privateMetadataUri" />
+        <editor:IntegerField name="max-supply" label="Max Supply" binding-path="maxSupply" />
+        <editor:PropertyField name="fees" label="Asset Royalty Fees" binding-path="fees" />
     </engine:Box >
 </engine:UXML>
