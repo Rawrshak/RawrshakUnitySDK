@@ -10,12 +10,16 @@
     </engine:Box>
 
     <engine:Box name="main-page" >
-        <engine:Label class="header" text="Asset Bundle Menu" />
+        <engine:Label class="header" text="Asset Bundles" />
         <engine:Label class="header-description" text="This is where you will generate the Asset Bundles." />
         
-        <engine:Foldout class="foldout-style" name="rawrshak-settings" text="Rawrshak">
-            <editor:EnumField name="build-target" label="Build Target" binding-path="selectedBuildTarget" />
+        <engine:Foldout class="foldout-style" name="settings" text="Settings">
+            <editor:EnumField name="build-target" label="Build Target" binding-path="buildTarget" />
             <engine:Button name="generate-asset-bundle-button" text="Generate Asset Bundles" />
+        </engine:Foldout>
+
+        <engine:Foldout class="foldout-style" name="untracked-asset-bundles" text="Untracked Asset Bundles">
+
         </engine:Foldout>
     </engine:Box>
     
