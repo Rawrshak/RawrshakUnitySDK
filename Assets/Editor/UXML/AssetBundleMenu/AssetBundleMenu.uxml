@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:Box name="rawrshak-label-box">
+        <engine:Label name="rawrshak-label" text="Rawrshak" />
+    </engine:Box>
+
+    <engine:Box name="main-page" >
+        <engine:Label class="header" text="Asset Bundle Menu" />
+        <engine:Label class="header-description" text="This is where you will generate the Asset Bundles." />
+        
+        <engine:Foldout class="foldout-style" name="rawrshak-settings" text="Rawrshak">
+            <editor:EnumField name="build-target" label="Build Target" binding-path="selectedBuildTarget" />
+            <engine:Button name="generate-asset-bundle-button" text="Generate Asset Bundles" />
+        </engine:Foldout>
+    </engine:Box>
+    
+    <engine:Box name="helpbox-holder" />
+</engine:UXML>
