@@ -15,9 +15,10 @@ namespace Rawrshak
     public class AssetBundleMenu : EditorWindow
     {
         // Private Menu Properties
-        public AssetBundleMenuConfig mConfig;
+        AssetBundleMenuConfig mConfig;
+        ABManager mManager;
 
-        // UI 
+        // UI
         Box mHelpBoxHolder;
 
         // Static Properties
@@ -42,11 +43,12 @@ namespace Rawrshak
             LoadUXML();
             LoadUSS();
 
-            LoadContent();
+            LoadUI();
             Debug.Log("AssetBundleMenu Enabled.");
         }
 
         public void OnDisable() {
+            mManager.CleanUp();
             AssetDatabase.SaveAssets();
             Debug.Log("AssetBundleMenu Disabled.");
         }
@@ -66,6 +68,13 @@ namespace Rawrshak
                 mConfig.Init();
                 AssetDatabase.CreateAsset(mConfig, String.Format("{0}/{1}/{2}.asset", RESOURCES_FOLDER, ASSET_BUNDLES_MENU_CONFIG_DIRECTORY, ASSET_BUNDLES_MENU_CONFIG_FILE));
             }
+
+            if (mManager == null)
+            {
+                mManager = ScriptableObject.CreateInstance<ABManager>();
+                mManager.Init(mConfig.assetBundleFolder, mConfig.buildTarget.ToString());
+            }
+
             AssetDatabase.SaveAssets();
         }
 
@@ -80,7 +89,7 @@ namespace Rawrshak
             rootVisualElement.styleSheets.Add(styleSheet);
         }
 
-        private void LoadContent() {
+        private void LoadUI() {
             // Build Target enum
             var settingsFoldout = rootVisualElement.Query<Foldout>("settings").First();
             var buildTargetEnumField = rootVisualElement.Query<EnumField>("build-target").First();
@@ -92,10 +101,14 @@ namespace Rawrshak
             buildTargetEnumField.RegisterCallback<ChangeEvent<System.Enum>>((evt) => {
                 // // Update the Build Target
                 var newTarget = (Rawrshak.SupportedBuildTargets)evt.newValue;
+                var newDirectory = String.Format("{0}/{1}", ASSET_BUNDLES_FOLDER, newTarget.ToString());
                 
                 // Update Asset Bundles Target Location
-                so.FindProperty("assetBundleFolder").stringValue = String.Format("{0}/{1}", ASSET_BUNDLES_FOLDER, newTarget.ToString());
+                so.FindProperty("assetBundleFolder").stringValue = newDirectory;
                 so.ApplyModifiedProperties();
+
+                mManager.LoadAssetBundle(newDirectory, newTarget.ToString());
+                mManager.ReloadUntrackedAssetBundles();
             });
             
             // Generate Asset Bundles Button
@@ -104,14 +117,18 @@ namespace Rawrshak
                 Debug.Log("Selected Target: " + mConfig.buildTarget);
                 Debug.Log("Folder Asset Bundles: " + mConfig.assetBundleFolder);
                 
-                // CreateAssetBundles.BuildAllAssetBundles(mConfig.buildTarget, folderName);
+                CreateAssetBundles.BuildAllAssetBundles(mConfig.buildTarget, mConfig.assetBundleFolder);
                 
-                // Todo: Refresh UI
-                // Refresh();
+                // Refresh New Asset Bundles
+                mManager.LoadAssetBundle(mConfig.assetBundleFolder, mConfig.buildTarget.ToString());
+                mManager.ReloadUntrackedAssetBundles();
             };
             
             // Helpbox holder
             mHelpBoxHolder = rootVisualElement.Query<Box>("helpbox-holder").First();
+
+            // Load Manager UI
+            mManager.LoadUI(rootVisualElement);
         }
     }
 }

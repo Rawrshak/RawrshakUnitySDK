@@ -17,6 +17,7 @@ public class CreateAssetBundles
         BuildPipeline.BuildAssetBundles(directory,
                                         BuildAssetBundleOptions.None, 
                                         ConvertToBuildTarget(buildTarget));
+        AssetDatabase.Refresh();
     }
 
     static BuildTarget ConvertToBuildTarget(SupportedBuildTargets buildTarget)
