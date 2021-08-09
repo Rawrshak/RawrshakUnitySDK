@@ -91,18 +91,22 @@ namespace Rawrshak
                     
                     if (mUntrackedAssetBundles.ContainsKey(name))
                     {
-                        Debug.Log("Replacing name: " + name);
                         var bundle = mUntrackedAssetBundles[name];
                         bundle.mHashId = hash;
                         bundle.mHash = hash.ToString();
                         bundle.mSelectedForUploading = false;
+                        bundle.mFileLocation = Application.dataPath + "/" + mAssetBundleDirectory + "/" + name;
                         bundle.mVisualElement.contentContainer.Query<Label>("asset-bundle-hash").First().text = hash.ToString();
                         bundle.mMarkedForDelete = false;
+                        // Debug.Log("Replacing name: " + bundle.mName);
+                        // Debug.Log("Bundle File Location: " + bundle.mFileLocation);
                     }
                     else
                     {
                         // find or add the asset bundle in the new asset bundle lists
-                        ABData bundle = new ABData(hash, name);
+                        // Todo: Update this to include file location
+                        string fileLocation = Application.dataPath + "/" + mAssetBundleDirectory + "/" + name;
+                        ABData bundle = new ABData(hash, name, fileLocation);
                         mUntrackedAssetBundles.Add(name, bundle);
 
                         // Add entry to UI

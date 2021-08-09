@@ -8,23 +8,35 @@ namespace Rawrshak
     [Serializable]
     public class ABData
     {
-        [NonSerialized]
-        public Hash128 mHashId;
         public string mHash;
         public string mName;
+        public string mFileLocation;
+        public string mStatus;
+        public int mNumOfConfirmations;
+        public string mTransactionId;
+        public string mUri;
 
+        // Non-Serialized Data
+        [NonSerialized]
+        public Hash128 mHashId;
         [NonSerialized]
         public TemplateContainer mVisualElement;
         [NonSerialized] 
         public bool mMarkedForDelete;
-
+        [NonSerialized] 
         public bool mSelectedForUploading;
 
-        public ABData(Hash128 hash, string name)
+        public ABData(Hash128 hash, string name, string fileLocation)
         {
-            mHashId = hash;
             mHash = hash.ToString();
             mName = name;
+            mFileLocation = fileLocation;
+            mStatus = "Untracked";
+            mNumOfConfirmations = 0;
+            mTransactionId = String.Empty;
+            mUri = String.Empty;
+            mHashId = hash;
+            mVisualElement = null;
             mSelectedForUploading = false;
             mMarkedForDelete = false;
         }

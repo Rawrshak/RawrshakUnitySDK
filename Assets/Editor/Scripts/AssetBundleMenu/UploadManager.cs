@@ -14,7 +14,7 @@ namespace Rawrshak
 {
     public class UploadManager : ScriptableObject
     {
-        public AssetBundleData bundleForUpload;
+        public ABData bundleForUpload;
 
         // Private Properties
         public UploadConfig mConfig;
@@ -77,14 +77,16 @@ namespace Rawrshak
             yield return null;
         }
 
-        public void UploadAssetBundle()
+        IEnumerator UploadAssetBundle()
         {
             PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/UploadAssetBundle.py");
+            yield return null;
         }
 
-        public void CheckStatus()
+        IEnumerator CheckStatus()
         {
             PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/CheckStatus.py");
+            yield return null;
         }
     }
 }

@@ -1,5 +1,6 @@
 import arweave
 import sys
+
 import clr
 from arweave.arweave_lib import Wallet, Transaction, ArweaveTransactionException
 from arweave.transaction_uploader import TransactionUploaderException, get_uploader
@@ -7,7 +8,7 @@ from arweave.transaction_uploader import TransactionUploaderException, get_uploa
 # This is a template for making callbacks into our C# code
 clr.AddReference('Rawrshak')
 import UnityEngine
-from Rawrshak import ArweaveSettings, AssetBundleManager
+from Rawrshak import UploadManager
 
 # Note:
 # SIGPIPE Fails in transaction_uploader so I went into transaction_uploader.py
@@ -20,20 +21,26 @@ from Rawrshak import ArweaveSettings, AssetBundleManager
 # except ImportError:  # If SIGPIPE is not available (win32),
 #     pass 
 
-assetBundleManager = UnityEngine.Object.FindObjectOfType(AssetBundleManager)
-arweaveSettings = UnityEngine.Object.FindObjectOfType(ArweaveSettings)
+all_asset_bundle_menus = UnityEngine.Resources.FindObjectsOfTypeAll(AssetBundleMenu)
 
-if assetBundleManager == None:
-    print("Error: No Asset Bundle Manager Found.")
+if all_asset_bundle_menus.Length == 0:
+    print("Upload Manager was not found.")
     quit()
 
-arweaveSettings = assetBundleManager.mArweaveSettings
+menu = all_asset_bundle_menus[0]
+uploadConfig = menu.mUploadManager.mConfig
+
+if uploadConfig == None:
+    menu.AddErrorHelpbox("No Upload Config Found.")
+    print("No Upload Config found.")
+    quit()
 
 try:
-    wallet = arweave.Wallet(arweaveSettings.arweaveWalletFile)
-    # wallet.api_url = arweaveSettings.arweaveGatewayUri
-    filename = arweaveSettings.bundleForUpload.mName
-    fileLocation = arweaveSettings.bundleForUpload.mFileLocation
+    wallet = arweave.Wallet(uploadConfig.walletFile)
+    wallet.api_url = uploadConfig.gatewayUri
+
+    filename = menu.mUploadManager.bundleForUpload.mName
+    fileLocation = menu.mUploadManager.bundleForUpload.mFileLocation
 
     print(filename)
     print(fileLocation)
@@ -78,24 +85,22 @@ try:
 
         status = tx.get_status()
         if status == "PENDING":
-            arweaveSettings.bundleForUpload.mStatus = "Pending"
+            menu.mUploadManager.bundleForUpload.mStatus = "Uploading"
         else:
-            arweaveSettings.bundleForUpload.mStatus = "Ready"
-            arweaveSettings.bundleForUpload.mNumOfConfirmations = status['number_of_confirmations']
+            menu.mUploadManager.bundleForUpload.mStatus = "Uploaded"
+            menu.mUploadManager.bundleForUpload.mNumOfConfirmations = status['number_of_confirmations']
         
-        # print("Status: " + status)
-        
-        arweaveSettings.bundleForUpload.mTransactionId = tx.id
-        arweaveSettings.bundleForUpload.mUri = tx.api_url + "/" + tx.id
+        menu.mUploadManager.bundleForUpload.mTransactionId = tx.id
+        menu.mUploadManager.bundleForUpload.mUri = tx.api_url + "/" + tx.id
 
 except TransactionUploaderException as tue:
     print(tue.args)
-    assetBundleManager.AddErrorHelpbox(tue.args)
+    menu.AddErrorHelpbox(tue.args)
 except ArweaveTransactionException as ae:
     print(ae.args)
-    assetBundleManager.AddErrorHelpbox(ae.args)
+    menu.AddErrorHelpbox(ae.args)
 except Exception as e:
     print(e.args)
-    assetBundleManager.AddErrorHelpbox(e.args)
+    menu.AddErrorHelpbox(e.args)
     # assetBundleManager.AddErrorHelpbox(str(sys.exc_info()[0]) + "\n" + str(sys.exc_info()[1]))
 
