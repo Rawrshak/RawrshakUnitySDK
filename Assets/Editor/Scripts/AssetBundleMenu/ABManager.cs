@@ -98,8 +98,8 @@ namespace Rawrshak
                         bundle.mFileLocation = Application.dataPath + "/" + mAssetBundleDirectory + "/" + name;
                         bundle.mVisualElement.contentContainer.Query<Label>("asset-bundle-hash").First().text = hash.ToString();
                         bundle.mMarkedForDelete = false;
-                        // Debug.Log("Replacing name: " + bundle.mName);
-                        // Debug.Log("Bundle File Location: " + bundle.mFileLocation);
+                        bundle.UpdateAssetNames();
+                        bundle.UpdateFileSize();
                     }
                     else
                     {

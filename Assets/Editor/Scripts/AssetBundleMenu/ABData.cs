@@ -15,6 +15,10 @@ namespace Rawrshak
         public int mNumOfConfirmations;
         public string mTransactionId;
         public string mUri;
+        public string mUploadTimestamp;
+        public string mUploaderAddress;
+        public List<string> mAssets;
+        public Int64 mFileSize;
 
         // Non-Serialized Data
         [NonSerialized]
@@ -39,11 +43,46 @@ namespace Rawrshak
             mVisualElement = null;
             mSelectedForUploading = false;
             mMarkedForDelete = false;
+            mUploadTimestamp = String.Empty;
+            mUploaderAddress = String.Empty;
+            UpdateFileSize();
+            UpdateAssetNames();
         }
 
         public void FromJSON()
         {
             mHashId = Hash128.Parse(mHash);
+        }
+
+        public void UpdateAssetNames()
+        {
+            var assetBundle = AssetBundle.LoadFromFile(mFileLocation);
+            if (assetBundle == null)
+            {
+                Debug.LogError("Asset Bundle Not Loaded: " + mName);
+                return;
+            }
+
+            mAssets = new List<string>();
+            var names = assetBundle.GetAllAssetNames();
+            foreach(string name in names)
+            {
+                mAssets.Add(name);
+            }
+            assetBundle.Unload(true);
+        }
+
+        public void UpdateFileSize()
+        {
+            System.IO.FileInfo fileInfo = new System.IO.FileInfo(mFileLocation);
+            if (fileInfo.Exists)
+            {
+                mFileSize = fileInfo.Length;
+            }
+            else
+            {
+                mFileSize = 0;
+            }
         }
     }
 }
