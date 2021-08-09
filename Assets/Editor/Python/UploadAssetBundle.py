@@ -85,7 +85,7 @@ try:
 
         status = tx.get_status()
         if status == "PENDING":
-            menu.mUploadManager.bundleForUpload.mStatus = "Uploading"
+            menu.mUploadManager.bundleForUpload.mStatus = "Uploading..."
         else:
             menu.mUploadManager.bundleForUpload.mStatus = "Uploaded"
             menu.mUploadManager.bundleForUpload.mNumOfConfirmations = status['number_of_confirmations']
@@ -102,5 +102,4 @@ except ArweaveTransactionException as ae:
 except Exception as e:
     print(e.args)
     menu.AddErrorHelpbox(e.args)
-    # assetBundleManager.AddErrorHelpbox(str(sys.exc_info()[0]) + "\n" + str(sys.exc_info()[1]))
 
