@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Rawrshak
 {
     [Serializable]
-    public class ABData
+    public class ABData : ScriptableObject
     {
         public string mHash;
         public string mName;

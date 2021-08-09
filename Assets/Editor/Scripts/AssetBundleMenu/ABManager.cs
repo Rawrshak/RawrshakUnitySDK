@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine.Events;
 using System.IO;
 
 namespace Rawrshak
@@ -18,7 +19,8 @@ namespace Rawrshak
         private string mAssetBundleDirectory; // Asset Bundle Directory
         private AssetBundle mFolderObj; // Asset Bundle Folder Object
         private AssetBundleManifest mManifest; // Asset Bundle Folder Manifest Object
-        
+        private UnityEvent<ABData> bundleSelected = new UnityEvent<ABData>();
+
         Dictionary<string, ABData> mUntrackedAssetBundles;
         Dictionary<Hash128, ABData> mUploadedAssetBundles;
         
@@ -37,8 +39,9 @@ namespace Rawrshak
             // Todo: Load list of new asset bundles that aren't in the 'uploaded asset bundles dictionary'
         }
 
-        public void Refresh()
+        public void SetBundleSelectedCallback(UnityAction<ABData> bundleSelectedCallback)
         {
+            bundleSelected.AddListener(bundleSelectedCallback);
         }
 
         public void CleanUp()
@@ -119,19 +122,17 @@ namespace Rawrshak
                         selectedToggle.RegisterCallback<ChangeEvent<bool>>((evt) => {
                             bundle.mSelectedForUploading = (evt.target as Toggle).value;
                         });
+
+                        // Select Asset Bundle Callback to show info
+                        entryTree.RegisterCallback<MouseDownEvent>((evt) => {
+                            bundleSelected.Invoke(bundle);;
+                        });
                         
                         bundle.mVisualElement = entryTree;
 
                         // Add entry to UI
                         mUntrackedAssetBundleHolder.Add(entryTree);
                     }
-
-                    // // Select Asset Bundle Callback
-                    // entryTree.RegisterCallback<MouseDownEvent>((evt) => {
-                    //     // assetBundleData.selected = (evt.target as Label).value;
-                    //     Debug.Log("Info to Display: " + assetBundleData.mName);
-                    //     ViewAssetBundleInfo(assetBundleData);
-                    // });
                 }
 
                 // Delete bundles marked for delete

@@ -17,6 +17,7 @@ namespace Rawrshak
         // Private Menu Properties
         AssetBundleMenuConfig mConfig;
         ABManager mAssetBundleManager;
+        ABViewer mViewer;
         public static UploadManager mUploadManager;
 
         // UI
@@ -36,6 +37,7 @@ namespace Rawrshak
         {
             AssetBundleMenu wnd = GetWindow<AssetBundleMenu>();
             wnd.titleContent = new GUIContent("Asset Bundles");
+            wnd.minSize = new Vector2(800, 400);
         }
 
         public void OnEnable() {
@@ -81,6 +83,14 @@ namespace Rawrshak
                 mUploadManager = ScriptableObject.CreateInstance<UploadManager>();
                 mUploadManager.Init();
             }
+
+            if (mViewer == null)
+            {
+                mViewer = ScriptableObject.CreateInstance<ABViewer>();
+            }
+
+            // Set BundleSelected callback
+            mAssetBundleManager.SetBundleSelectedCallback(mViewer.SetAssetBundle);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -140,6 +150,9 @@ namespace Rawrshak
             
             // Load Manager UI
             mUploadManager.LoadUI(rootVisualElement);
+
+            // Load Viewer
+            mViewer.LoadUI(rootVisualElement);
         }
 
         public void ClearHelpbox()
