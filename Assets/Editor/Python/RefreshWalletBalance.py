@@ -9,34 +9,35 @@ from arweave.arweave_lib import ArweaveTransactionException
 # This is a template for making callbacks into our C# code
 clr.AddReference('Rawrshak')
 import UnityEngine
-from Rawrshak import ArweaveSettings
-from Rawrshak import AssetBundleManager
+from Rawrshak import AssetBundleMenu
 
-arweaveSettings = None
-settingsManager = None
+all_asset_bundle_menus = UnityEngine.Resources.FindObjectsOfTypeAll(AssetBundleMenu)
 
-assetBundleManager = UnityEngine.Object.FindObjectOfType(AssetBundleManager)
-
-if assetBundleManager == None:
-    print("Error: No Asset Bundle Manager Found.")
+if all_asset_bundle_menus.Length == 0:
+    print("Upload Manager was not found.")
     quit()
 
-arweaveSettings = assetBundleManager.mArweaveSettings
+menu = all_asset_bundle_menus[0]
+uploadConfig = menu.mUploadManager.mConfig
 
-if arweaveSettings == None:
-    assetBundleManager.AddErrorHelpbox("No Arweave Settings Found.")
+if uploadConfig == None:
+    menu.AddErrorHelpbox("No Upload Config Found.")
+    print("No Upload Config found.")
     quit()
 
 try:
-    wallet = arweave.Wallet(arweaveSettings.arweaveWalletFile)
-    wallet.api_url = arweaveSettings.arweaveGatewayUri
-    print(ar_to_winston(wallet.balance))
-    arweaveSettings.walletBalance = ar_to_winston(wallet.balance)
+    wallet = arweave.Wallet(uploadConfig.walletFile)
+    wallet.api_url = uploadConfig.gatewayUri
+
+    print("Balance: " + str(wallet.balance))
+    uploadConfig.walletBalance = str(wallet.balance)
+    
+    menu.ClearHelpbox()
 except ArweaveTransactionException as ae:
     print(ae.message)
-    assetBundleManager.AddErrorHelpbox(ae.message)
+    menu.AddErrorHelpbox(ae.message)
 except Exception as e:
     # print("Error ", e.__class__, ", [Cause]: ", e.msg)
     # print(e.__class__)
     # print(sys.exc_info())
-    assetBundleManager.AddErrorHelpbox(str(sys.exc_info()[0]) + "\n" + str(sys.exc_info()[1]))
+    menu.AddErrorHelpbox(str(sys.exc_info()[0]) + "\n" + str(sys.exc_info()[1]))

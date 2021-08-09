@@ -16,7 +16,8 @@ namespace Rawrshak
     {
         // Private Menu Properties
         AssetBundleMenuConfig mConfig;
-        ABManager mManager;
+        ABManager mAssetBundleManager;
+        public static UploadManager mUploadManager;
 
         // UI
         Box mHelpBoxHolder;
@@ -48,7 +49,7 @@ namespace Rawrshak
         }
 
         public void OnDisable() {
-            mManager.CleanUp();
+            mAssetBundleManager.CleanUp();
             AssetDatabase.SaveAssets();
             Debug.Log("AssetBundleMenu Disabled.");
         }
@@ -69,13 +70,20 @@ namespace Rawrshak
                 AssetDatabase.CreateAsset(mConfig, String.Format("{0}/{1}/{2}.asset", RESOURCES_FOLDER, ASSET_BUNDLES_MENU_CONFIG_DIRECTORY, ASSET_BUNDLES_MENU_CONFIG_FILE));
             }
 
-            if (mManager == null)
+            if (mAssetBundleManager == null)
             {
-                mManager = ScriptableObject.CreateInstance<ABManager>();
-                mManager.Init(mConfig.assetBundleFolder, mConfig.buildTarget.ToString());
+                mAssetBundleManager = ScriptableObject.CreateInstance<ABManager>();
+                mAssetBundleManager.Init(mConfig.assetBundleFolder, mConfig.buildTarget.ToString());
+            }
+
+            if (mUploadManager == null)
+            {
+                mUploadManager = ScriptableObject.CreateInstance<UploadManager>();
+                mUploadManager.Init();
             }
 
             AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         private void LoadUXML() {
@@ -107,8 +115,8 @@ namespace Rawrshak
                 so.FindProperty("assetBundleFolder").stringValue = newDirectory;
                 so.ApplyModifiedProperties();
 
-                mManager.LoadAssetBundle(newDirectory, newTarget.ToString());
-                mManager.ReloadUntrackedAssetBundles();
+                mAssetBundleManager.LoadAssetBundle(newDirectory, newTarget.ToString());
+                mAssetBundleManager.ReloadUntrackedAssetBundles();
             });
             
             // Generate Asset Bundles Button
@@ -120,15 +128,28 @@ namespace Rawrshak
                 CreateAssetBundles.BuildAllAssetBundles(mConfig.buildTarget, mConfig.assetBundleFolder);
                 
                 // Refresh New Asset Bundles
-                mManager.LoadAssetBundle(mConfig.assetBundleFolder, mConfig.buildTarget.ToString());
-                mManager.ReloadUntrackedAssetBundles();
+                mAssetBundleManager.LoadAssetBundle(mConfig.assetBundleFolder, mConfig.buildTarget.ToString());
+                mAssetBundleManager.ReloadUntrackedAssetBundles();
             };
             
             // Helpbox holder
             mHelpBoxHolder = rootVisualElement.Query<Box>("helpbox-holder").First();
 
             // Load Manager UI
-            mManager.LoadUI(rootVisualElement);
+            mAssetBundleManager.LoadUI(rootVisualElement);
+            
+            // Load Manager UI
+            mUploadManager.LoadUI(rootVisualElement);
+        }
+
+        public void ClearHelpbox()
+        {
+            mHelpBoxHolder.Clear();
+        }
+
+        public void AddErrorHelpbox(string errorMsg)
+        {
+            mHelpBoxHolder.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
         }
     }
 }

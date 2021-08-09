@@ -58,49 +58,6 @@ namespace Rawrshak
             // Asset Bundle Entries
             mUntrackedAssetBundleHolder = root.Query<Box>("new-entries").First();
             ReloadUntrackedAssetBundles();
-
-            // var generateAssetBundles = root.Query<Button>("create-asset-bundles-button").First();
-            // generateAssetBundles.clicked += () => {
-            //     CreateAssetBundles.BuildAllAssetBundles(mRawrshakSettings.buildTarget, mRawrshakSettings.assetBundleFolder);
-            //     Refresh();
-            // };
-
-            // var walletInfoBox = root.Query<Box>("wallet-info").First();
-            // SerializedObject so = new SerializedObject(mArweaveSettings);
-            // walletInfoBox.Bind(so);
-
-            // var refreshBalanceButton = root.Query<Button>("refresh-balance").First();
-            // refreshBalanceButton.clicked += () => {
-            //     mArweaveSettings.RefreshBalance();
-            // };
-
-            // mAssetBundleEntries = root.Query<Box>("asset-bundle-entries").First();
-            // mUploadedAsssetBundleEntries = root.Query<Box>("uploaded-asset-bundle-entries").First();
-            // mAssetBundleInfoBox = root.Query<Box>("asset-bundle-info").First();
-
-            // // var printButton = root.Query<Button>("print-button").First();
-            // // printButton.clicked += () => {
-            // //     Refresh();
-            // // };
-            
-            // var uploadButton = root.Query<Button>("upload-button").First();
-            // uploadButton.clicked += () => {
-            //     UploadAssetBundles();
-
-            //     // Update UI
-            //     Refresh();
-            //     RefreshUploadedAssetBundlesBox();
-            // };
-
-            // // Refresh some UI
-            // Refresh();
-            // RefreshUploadedAssetBundlesBox();
-
-            // if (String.IsNullOrEmpty(mArweaveSettings.wallet))
-            // {
-            //     HelpBox helpbox = new HelpBox("Load an Arweave Wallet in the Settings tab.", HelpBoxMessageType.Error);
-            //     mHelpBoxHolder.Add(helpbox);
-            // }
         }
         
         public void ReloadUntrackedAssetBundles()
