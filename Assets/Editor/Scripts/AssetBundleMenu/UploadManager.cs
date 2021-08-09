@@ -1,11 +1,14 @@
-using UnityEngine;
+
+using System;
+using System.IO;
+using System.Collections;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
+using UnityEngine;
 using UnityEditor.Scripting.Python;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
-using System;
-using System.IO;
-using System.Collections.Generic;
+// using System.Collections.Generic;
 
 namespace Rawrshak
 {
@@ -38,12 +41,12 @@ namespace Rawrshak
 
             var refreshBalanceButton = root.Query<Button>("refresh-balance-button").First();
             refreshBalanceButton.clicked += () => {
-                RefreshBalance();
+                EditorCoroutineUtility.StartCoroutine(RefreshBalance(), this);
             };
             
             var loadWalletButton = root.Query<Button>("load-wallet-button").First();
             loadWalletButton.clicked += () => {
-                LoadWallet();
+                EditorCoroutineUtility.StartCoroutine(LoadWallet(), this);
             };
             
             // var uploadButton = root.Query<Button>("upload-button").First();
@@ -62,25 +65,16 @@ namespace Rawrshak
             }
         }
         
-        public void LoadWallet()
+        IEnumerator LoadWallet()
         {
-            UploadConfig[] configs = Resources.FindObjectsOfTypeAll(typeof(UploadConfig)) as UploadConfig[];
-            // var manager = UnityEngine.Resources.FindObjectOfType(typeof(UploadManager));
-            if (configs.Length > 0)
-            {
-                Debug.Log("Upload Manager Found!");
-            }
-            else
-            {
-                Debug.Log("Upload Manager Not Found");
-            }
-
             PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/VerifyArweaveConnection.py");
+            yield return null;
         }
         
-        public void RefreshBalance()
+        IEnumerator RefreshBalance()
         {
             PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/RefreshWalletBalance.py");
+            yield return null;
         }
 
         public void UploadAssetBundle()

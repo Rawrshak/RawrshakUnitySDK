@@ -30,8 +30,8 @@
             <engine:TextField label="Arweave Gateway URI" binding-path="gatewayUri" />
             <engine:TextField label="Wallet File Location" binding-path="walletFile" />
             <engine:Box style="flex-direction: Row;" >
-                <engine:Button name="load-wallet-button" text="Load Wallet" />
-                <engine:Button name="refresh-balance-button" text="Refresh Balance" />
+                <engine:Button name="load-wallet-button" text="Load Wallet" style="width: 50%; -unity-text-align: middle-center; font-size: 14px;" />
+                <engine:Button name="refresh-balance-button" text="Refresh Balance" style="width: 50%; -unity-text-align: middle-center; font-size: 14px;" />
             </engine:Box>
         </engine:Foldout>
 

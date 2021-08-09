@@ -22,7 +22,7 @@ namespace Rawrshak
         {
             Debug.Log("Initializing UploadManager.");
             gatewayUri = "http://arweave.net";
-            walletFile = "sadsd";
+            walletFile = String.Empty;
             walletAddress = String.Empty;
             walletBalance = "0.0";
         }
