@@ -2,19 +2,20 @@
 using System;
 using System.IO;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.Scripting.Python;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
-// using System.Collections.Generic;
 
 namespace Rawrshak
 {
     public class UploadManager : ScriptableObject
     {
         public ABData bundleForUpload;
+        public ABData bundleToCheckStatus;
 
         // Private Properties
         public UploadConfig mConfig;
@@ -64,6 +65,30 @@ namespace Rawrshak
                 mHelpBoxHolder.Add(helpbox);
             }
         }
+
+        public void UploadBundles(List<ABData> bundles)
+        {
+            if (String.IsNullOrEmpty(mConfig.walletAddress))
+            {
+                AddErrorHelpbox("No Wallet Loaded.");
+                return;
+            }
+
+            foreach(var bundle in bundles)
+            {
+                bundleForUpload = bundle;
+                Debug.Log("Uploading bundle: " + bundleForUpload.mName);
+                // Todo: Upload files
+            }
+        }
+
+        public void CheckUploadStatus(ABData bundle)
+        {
+            bundleToCheckStatus = bundle;
+            
+            // check status
+            EditorCoroutineUtility.StartCoroutine(CheckStatus(), this);
+        }
         
         IEnumerator LoadWallet()
         {
@@ -73,12 +98,22 @@ namespace Rawrshak
         
         IEnumerator RefreshBalance()
         {
+            if (String.IsNullOrEmpty(mConfig.walletAddress))
+            {
+                AddErrorHelpbox("No Wallet Loaded.");
+                yield break;
+            }
             PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/RefreshWalletBalance.py");
             yield return null;
         }
 
         IEnumerator UploadAssetBundle()
         {
+            if (String.IsNullOrEmpty(mConfig.walletAddress))
+            {
+                AddErrorHelpbox("No Wallet Loaded.");
+                yield break;
+            }
             PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/UploadAssetBundle.py");
             yield return null;
         }
@@ -87,6 +122,11 @@ namespace Rawrshak
         {
             PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/CheckStatus.py");
             yield return null;
+        }
+
+        public void AddErrorHelpbox(string errorMsg)
+        {
+            mHelpBoxHolder.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
         }
     }
 }

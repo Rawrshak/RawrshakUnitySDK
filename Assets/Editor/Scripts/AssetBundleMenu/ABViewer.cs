@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine.Events;
 
 namespace Rawrshak
 {
@@ -16,6 +17,7 @@ namespace Rawrshak
         Box mViewer;
         
         VisualTreeAsset mBundleTreeAsset;
+        UnityEvent<ABData> mCheckUploadStatusCallback = new UnityEvent<ABData>();
 
         public void SetAssetBundle(ABData assetBundle)
         {
@@ -29,7 +31,23 @@ namespace Rawrshak
             SerializedObject so = new SerializedObject(mAssetBundle);
             bundleView.Bind(so);
 
+            // Register button click for check status callback
+            var checkStatusButton = bundleTree.contentContainer.Query<Button>("check-status").First();
+            checkStatusButton.clicked += () => {
+                if (String.IsNullOrEmpty(mAssetBundle.mTransactionId))
+                {
+                    AddErrorHelpbox("Bundle has not been uploaded yet.");
+                    return;
+                }
+                mCheckUploadStatusCallback.Invoke(mAssetBundle);
+            };
+
             mViewer.Add(bundleTree);
+        }
+
+        public void SetCheckStatusCallback(UnityAction<ABData> checkUploadStatusCallback)
+        {
+            mCheckUploadStatusCallback.AddListener(checkUploadStatusCallback);
         }
         
         public void LoadUI(VisualElement root)

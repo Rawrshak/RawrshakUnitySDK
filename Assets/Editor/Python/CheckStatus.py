@@ -37,24 +37,18 @@ if uploadConfig == None:
 try:
     wallet = arweave.Wallet(uploadConfig.walletFile)
     wallet.api_url = uploadConfig.gatewayUri
-    filename = menu.mUploadManager.bundleForUpload.mName
-    fileLocation = menu.mUploadManager.bundleForUpload.mFileLocation
-
-
-    # print(filename)
-    # print(fileLocation)
-    # print("Wallet API: " + wallet.api_url)
+    bundle = menu.mUploadManager.bundleToCheckStatus
     
     # Get the transaction's status
-    transaction = Transaction(wallet, id=menu.mUploadManager.bundleForUpload.mTransactionId)
+    transaction = Transaction(wallet, id=bundle.mTransactionId)
     status = transaction.get_status()
     
     # Update the status in the UI
     if status == "PENDING":
-        menu.mUploadManager.bundleForUpload.mStatus = "Uploading..."
+        bundle.mStatus = "Uploading..."
     else:
-        menu.mUploadManager.bundleForUpload.mStatus = "Uploaded"
-        menu.mUploadManager.bundleForUpload.mNumOfConfirmations = status['number_of_confirmations']
+        bundle.mStatus = "Uploaded"
+        bundle.mNumOfConfirmations = status['number_of_confirmations']
     
 except TransactionUploaderException as tue:
     print(tue.args)

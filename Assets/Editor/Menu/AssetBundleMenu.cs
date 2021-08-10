@@ -91,6 +91,8 @@ namespace Rawrshak
 
             // Set BundleSelected callback
             mAssetBundleManager.SetBundleSelectedCallback(mViewer.SetAssetBundle);
+            mAssetBundleManager.SetUploadBundleCallback(mUploadManager.UploadBundles);
+            mViewer.SetCheckStatusCallback(mUploadManager.CheckUploadStatus);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
