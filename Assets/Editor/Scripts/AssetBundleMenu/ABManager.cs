@@ -13,7 +13,7 @@ namespace Rawrshak
     public class ABManager : ScriptableObject
     {
         // Static Properties
-        static string UPLOADED_LIST_FILE = "Assets/Editor/Resources/AssetBundlesMenuConfig/UploadedListAssetBundlesInfo.json";
+        static string ASSET_BUNDLES_UPLOADED_DIRECTORY = "UploadedAssetBundles";
 
         // Private Properties
         private string mAssetBundleDirectory; // Asset Bundle Directory
@@ -32,12 +32,52 @@ namespace Rawrshak
         public void Init(string directory, string folderObjName)
         {
             LoadAssetBundle(directory, folderObjName);
-            
-            mUntrackedAssetBundles = new Dictionary<string, ABData>();
-            mUploadedAssetBundles = new Dictionary<Hash128, ABData>();
 
             // Todo: Load dictionary of uploaded asset bundles
             // Todo: Load list of new asset bundles that aren't in the 'uploaded asset bundles dictionary'
+        }
+
+        public void OnEnable()
+        {            
+            mUntrackedAssetBundles = new Dictionary<string, ABData>();
+            mUploadedAssetBundles = new Dictionary<Hash128, ABData>();
+
+            // Create Uploaded Asset Bundles Directory if necessary
+            string directoryPath = String.Format("{0}/{1}", AssetBundleMenu.RESOURCES_FOLDER, ASSET_BUNDLES_UPLOADED_DIRECTORY);
+            if(!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            // Load all Asset Bundle Data from storage if any
+            foreach (ABData bundle in Resources.LoadAll("UploadedAssetBundles", typeof(ABData)))
+            {
+                // Only Load asset bundle data that are stored
+                if (EditorUtility.IsPersistent(bundle))
+                {
+                    bundle.SetHash128();
+
+                    // Set Non-serialized data to default values
+                    if (!mUploadedAssetBundles.ContainsKey(bundle.mHashId))
+                    {
+                        mUploadedAssetBundles.Add(bundle.mHashId, bundle);
+                        Debug.Log("Adding Uploaded Bundle: " + bundle.mName + ", ID: " + bundle.mHash);
+                    }
+                }
+            }
+        }
+
+        public void OnDisable()
+        {
+            if (mFolderObj)
+            {
+                mFolderObj.Unload(true);
+            }
+            mManifest = null;
+
+            // Save any asset bundles whose data changed
+            AssetDatabase.SaveAssets();
+            Debug.Log("ABManager OnDisable");
         }
 
         public void SetBundleSelectedCallback(UnityAction<ABData> bundleSelectedCallback)
@@ -49,16 +89,6 @@ namespace Rawrshak
         {
             mUploadBundleCallback.AddListener(uploadBundleCallback);
         }
-
-        public void CleanUp()
-        {
-            if (mFolderObj)
-            {
-                mFolderObj.Unload(true);   
-                SaveUploadedAssetBundlesList();
-            }
-            mManifest = null;
-        }
         
         public void LoadUI(VisualElement root)
         {
@@ -69,11 +99,20 @@ namespace Rawrshak
 
             var uploadButton = root.Query<Button>("upload-button").First();
             uploadButton.clicked += () => {
-                var list = BuildUploadList();
-                mUploadBundleCallback.Invoke(list);
+                // Todo: Get Config a better way
+                var config = Resources.FindObjectsOfTypeAll(typeof(UploadConfig));
+                if (config[0] != null)
+                {
+                    if (String.IsNullOrEmpty(((UploadConfig)config[0]).walletAddress))
+                    {
+                        AddErrorHelpbox("No Wallet Loaded.");
+                        return;
+                    }
+                    var list = BuildUploadList();
+                    mUploadBundleCallback.Invoke(list);
+                }
             };
             
-
             ReloadUntrackedAssetBundles();
         }
         
@@ -100,11 +139,10 @@ namespace Rawrshak
                     var hash = mManifest.GetAssetBundleHash(name);
                     // Debug.Log("AssetBundle: " + name + ", hash: " + hash);
 
-                    // Todo: Skip if it is already uploaded
-                    // if (mAssetBundlesInfo.mDictionary.ContainsKey(hash))
-                    // {
-                    //     continue;
-                    // }
+                    if (mUploadedAssetBundles.ContainsKey(hash))
+                    {
+                        continue;
+                    }
                     
                     if (mUntrackedAssetBundles.ContainsKey(name))
                     {
@@ -194,33 +232,6 @@ namespace Rawrshak
             }
         }
 
-        public void SaveUploadedAssetBundlesList()
-        {
-            Debug.Log("AssetBundlesInfo length: " + mUploadedAssetBundles.Count);
-            if (mUploadedAssetBundles == null) {
-                return;
-            }
-
-            // Convert List of Uploaded Asset Bundles to json file
-            List<ABData> dataList = new List<ABData>();
-            var iter = mUploadedAssetBundles.GetEnumerator();
-            while (iter.MoveNext()) 
-            {
-                dataList.Add(iter.Current.Value);
-            }
-            string data = JsonUtility.ToJson(dataList);
-            
-            // Delete file and .meta filefirst
-            File.Delete(UPLOADED_LIST_FILE);
-            File.Delete(UPLOADED_LIST_FILE + ".meta");
-            
-            // write file 
-            StreamWriter writer = new StreamWriter(UPLOADED_LIST_FILE, true);
-            writer.WriteLine(data);
-            writer.Close();
-            AssetDatabase.Refresh();
-        }
-
         public void AddErrorHelpbox(string errorMsg)
         {
             mHelpBoxHolder.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
@@ -236,10 +247,42 @@ namespace Rawrshak
                 if (iter.Current.Value.mSelectedForUploading)
                 {
                     list.Add(iter.Current.Value);
+                    
+                    // Save uploaded bundle to file
+                    SaveAssetBundle(iter.Current.Value);
+
+                    // Add uploaded bundle to dictionary
+                    mUploadedAssetBundles.Add(iter.Current.Value.mHashId, iter.Current.Value);
                 }
             }
+            AssetDatabase.SaveAssets();
+
+            // remove mUntrackedAssetBundles
+            foreach (var bundle in list)
+            {
+                mUntrackedAssetBundleHolder.Remove(bundle.mVisualElement);
+                mUntrackedAssetBundles.Remove(bundle.mName);
+            }
+
+            Debug.Log("Untracked Bundles List Size: " + mUntrackedAssetBundles.Count);
 
             return list;
+        }
+
+        private void SaveAssetBundle(ABData bundle)
+        {
+            string storageFile = String.Format(
+                    "{0}/{1}/{2}-{3}.asset",
+                    AssetBundleMenu.RESOURCES_FOLDER,
+                    ASSET_BUNDLES_UPLOADED_DIRECTORY, 
+                    bundle.mName, 
+                    bundle.mHash);
+
+            System.IO.FileInfo fileInfo = new System.IO.FileInfo(storageFile);
+            if (!fileInfo.Exists)
+            {
+                AssetDatabase.CreateAsset(bundle, storageFile);
+            }
         }
     }
 }

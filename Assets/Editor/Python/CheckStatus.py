@@ -49,6 +49,8 @@ try:
     else:
         bundle.mStatus = "Uploaded"
         bundle.mNumOfConfirmations = status['number_of_confirmations']
+        
+        # Todo: Query for the transaction block and the block timestamp
     
 except TransactionUploaderException as tue:
     print(tue.args)

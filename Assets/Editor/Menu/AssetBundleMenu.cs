@@ -24,10 +24,10 @@ namespace Rawrshak
         Box mHelpBoxHolder;
 
         // Static Properties
-        static string ASSET_BUNDLES_FOLDER = "AssetBundles";
-        static string RESOURCES_FOLDER = "Assets/Editor/Resources";
-        static string ASSET_BUNDLES_MENU_CONFIG_DIRECTORY = "AssetBundlesMenuConfig";
-        static string ASSET_BUNDLES_MENU_CONFIG_FILE = "config";
+        public static string ASSET_BUNDLES_FOLDER = "AssetBundles";
+        public static string RESOURCES_FOLDER = "Assets/Editor/Resources";
+        public static string ASSET_BUNDLES_MENU_CONFIG_DIRECTORY = "AssetBundlesMenuConfig";
+        static string ASSET_BUNDLES_MENU_CONFIG_FILE = "MenuConfig";
         static Color selectedBGColor = new Color(90f/255f, 90f/255f, 90f/255f, 1f);
         static Color unselectedBGColor = new Color(60f/255f, 60f/255f, 60f/255f, 1f);
 
@@ -50,9 +50,14 @@ namespace Rawrshak
             Debug.Log("AssetBundleMenu Enabled.");
         }
 
-        public void OnDisable() {
-            mAssetBundleManager.CleanUp();
+        public void OnDisable()
+        {
             AssetDatabase.SaveAssets();
+
+            ScriptableObject.DestroyImmediate(mAssetBundleManager);
+            ScriptableObject.DestroyImmediate(mViewer);
+            ScriptableObject.DestroyImmediate(mUploadManager);
+
             Debug.Log("AssetBundleMenu Disabled.");
         }
 
@@ -81,7 +86,6 @@ namespace Rawrshak
             if (mUploadManager == null)
             {
                 mUploadManager = ScriptableObject.CreateInstance<UploadManager>();
-                mUploadManager.Init();
             }
 
             if (mViewer == null)

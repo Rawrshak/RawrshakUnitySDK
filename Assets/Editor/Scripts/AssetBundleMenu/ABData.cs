@@ -49,7 +49,7 @@ namespace Rawrshak
             UpdateAssetNames();
         }
 
-        public void FromJSON()
+        public void SetHash128()
         {
             mHashId = Hash128.Parse(mHash);
         }

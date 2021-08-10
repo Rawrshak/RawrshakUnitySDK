@@ -22,14 +22,20 @@ namespace Rawrshak
         
         Box mHelpBoxHolder;
 
-        public void Init()
+        // Static Properties
+        static string UPLOAD_CONFIG_FILE = "UploadConfig";
+
+        public void OnEnable()
         {
-            Debug.Log("Initializing ArweaveSettings.");
+            Debug.Log("Initializing UploadManager.");
+            mConfig = Resources.Load<UploadConfig>(String.Format("{0}/{1}", AssetBundleMenu.ASSET_BUNDLES_MENU_CONFIG_DIRECTORY, UPLOAD_CONFIG_FILE));
             if (mConfig == null)
             {
                 mConfig = ScriptableObject.CreateInstance<UploadConfig>();
                 mConfig.Init();
+                AssetDatabase.CreateAsset(mConfig, String.Format("{0}/{1}/{2}.asset", AssetBundleMenu.RESOURCES_FOLDER, AssetBundleMenu.ASSET_BUNDLES_MENU_CONFIG_DIRECTORY, UPLOAD_CONFIG_FILE));
             }
+            AssetDatabase.SaveAssets();
         }
 
         public void LoadUI(VisualElement root)
@@ -78,7 +84,16 @@ namespace Rawrshak
             {
                 bundleForUpload = bundle;
                 Debug.Log("Uploading bundle: " + bundleForUpload.mName);
-                // Todo: Upload files
+                
+                // This has to be synchronous because the python script reads 
+                // off of the bundle listed here. You might want to just have
+                // the python script load the entire bundle list and upload instead
+                // of doing it one by one. At which point, you can rever this back
+                // to a coroutine
+                // Todo: Update script to upload the entire list of bundle instead
+                // of doing this one by one. 
+                UploadAssetBundle();
+                // EditorCoroutineUtility.StartCoroutine(UploadAssetBundle(), this);
             }
         }
 
@@ -107,15 +122,21 @@ namespace Rawrshak
             yield return null;
         }
 
-        IEnumerator UploadAssetBundle()
+        // Todo: rever this back to a coroutine
+        void UploadAssetBundle()
         {
             if (String.IsNullOrEmpty(mConfig.walletAddress))
             {
                 AddErrorHelpbox("No Wallet Loaded.");
-                yield break;
+                // yield break;
             }
             PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/UploadAssetBundle.py");
-            yield return null;
+            // yield return null;
+
+            // Save the info that the python scripts updated
+            AssetDatabase.Refresh();
+            EditorUtility.SetDirty(bundleForUpload);
+            AssetDatabase.SaveAssets();
         }
 
         IEnumerator CheckStatus()

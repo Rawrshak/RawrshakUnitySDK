@@ -8,7 +8,7 @@ from arweave.transaction_uploader import TransactionUploaderException, get_uploa
 # This is a template for making callbacks into our C# code
 clr.AddReference('Rawrshak')
 import UnityEngine
-from Rawrshak import UploadManager
+from Rawrshak import AssetBundleMenu
 
 # Note:
 # SIGPIPE Fails in transaction_uploader so I went into transaction_uploader.py
@@ -70,31 +70,39 @@ try:
     #     print("Status: " + status)
     #####################################################
 
-    with open(fileLocation, "rb", buffering=0) as fileHandler:
-        tx = arweave.Transaction(wallet, file_handler=fileHandler, file_path=fileLocation)
-        # tx.api_url = arweaveSettings.arweaveGatewayUri
-        tx.add_tag('Content-Type', 'application/octet-stream')
-        tx.sign()
+    # with open(fileLocation, "rb", buffering=0) as fileHandler:
+    #     tx = arweave.Transaction(wallet, file_handler=fileHandler, file_path=fileLocation)
+    #     # tx.api_url = arweaveSettings.arweaveGatewayUri
+    #     tx.add_tag('Content-Type', 'application/octet-stream')
+    #     tx.sign()
         
-        uploader = get_uploader(tx, fileHandler)
+    #     uploader = get_uploader(tx, fileHandler)
 
-        while not uploader.is_complete:
-            uploader.upload_chunk()
+    #     while not uploader.is_complete:
+    #         uploader.upload_chunk()
 
-            print("{}% complete, {}/{}".format(
-                uploader.pct_complete, uploader.uploaded_chunks, uploader.total_chunks
-            ))
+    #         print("{}% complete, {}/{}".format(
+    #             uploader.pct_complete, uploader.uploaded_chunks, uploader.total_chunks
+    #         ))
 
-        status = tx.get_status()
-        if status == "PENDING":
-            bundle.mStatus = "Uploading..."
-        else:
-            bundle.mStatus = "Uploaded"
-            bundle.mNumOfConfirmations = status['number_of_confirmations']
+    #     status = tx.get_status()
+    #     if status == "PENDING":
+    #         bundle.mStatus = "Uploading..."
+    #     else:
+    #         bundle.mStatus = "Uploaded"
+    #         bundle.mNumOfConfirmations = status['number_of_confirmations']
         
-        bundle.mTransactionId = tx.id
-        bundle.mUri = tx.api_url + "/" + tx.id
-        bundle.mUploaderAddress = wallet.address
+    #     bundle.mTransactionId = tx.id
+    #     bundle.mUri = tx.api_url + "/" + tx.id
+    #     bundle.mUploaderAddress = wallet.address
+
+    # Todo: This is only temporary. Uncomment the block above to upload asset properly
+    bundle.mStatus = "Uploaded"
+    bundle.mNumOfConfirmations = 10
+    
+    bundle.mTransactionId = "0x1283129312"
+    bundle.mUri = wallet.api_url + "/" + bundle.mTransactionId
+    bundle.mUploaderAddress = wallet.address
 
 except TransactionUploaderException as tue:
     print(tue.args)
