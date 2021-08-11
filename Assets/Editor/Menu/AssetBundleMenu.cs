@@ -37,7 +37,7 @@ namespace Rawrshak
         {
             AssetBundleMenu wnd = GetWindow<AssetBundleMenu>();
             wnd.titleContent = new GUIContent("Asset Bundles");
-            wnd.minSize = new Vector2(800, 400);
+            wnd.minSize = new Vector2(1200, 400);
         }
 
         public void OnEnable() {

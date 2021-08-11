@@ -134,7 +134,6 @@ namespace Rawrshak
             // yield return null;
 
             // Save the info that the python scripts updated
-            AssetDatabase.Refresh();
             EditorUtility.SetDirty(bundleForUpload);
             AssetDatabase.SaveAssets();
         }

@@ -27,7 +27,10 @@ namespace Rawrshak
         
         // UI
         Box mUntrackedAssetBundleHolder;
+        Box mUploadedAssetBundleHolder;
         Box mHelpBoxHolder;
+        VisualTreeAsset mUploadedBundleEntry;
+        VisualTreeAsset mUntrackedBundleEntry;
 
         public void Init(string directory, string folderObjName)
         {
@@ -96,6 +99,11 @@ namespace Rawrshak
 
             // Asset Bundle Entries
             mUntrackedAssetBundleHolder = root.Query<Box>("new-entries").First();
+            mUploadedAssetBundleHolder = root.Query<Box>("uploaded-entries").First();
+            
+            // Load Entry UXMLs
+            mUploadedBundleEntry = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/AssetBundleMenu/UploadedAssetBundle.uxml");
+            mUntrackedBundleEntry = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/AssetBundleMenu/UntrackedAssetBundle.uxml");
 
             var uploadButton = root.Query<Button>("upload-button").First();
             uploadButton.clicked += () => {
@@ -114,15 +122,19 @@ namespace Rawrshak
             };
             
             ReloadUntrackedAssetBundles();
+
+            // Load Uploaded Asset Bundles from storage
+            var iter = mUploadedAssetBundles.GetEnumerator();
+            while(iter.MoveNext())
+            {
+                AddUploadedAssetBundleForDisplay(iter.Current.Value);
+            }
         }
         
         public void ReloadUntrackedAssetBundles()
         {
             // Clear helper box
             mHelpBoxHolder.Clear();
-
-            // Load Entry UML
-            var entry = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML/AssetBundleMenu/UntrackedAssetBundle.uxml");
 
             if (mManifest)
             {
@@ -166,7 +178,7 @@ namespace Rawrshak
                         mUntrackedAssetBundles.Add(name, bundle);
 
                         // Add entry to UI
-                        TemplateContainer entryTree = entry.CloneTree();
+                        TemplateContainer entryTree = mUntrackedBundleEntry.CloneTree();
                         entryTree.contentContainer.Query<Label>("asset-bundle-name").First().text = name;
                         entryTree.contentContainer.Query<Label>("asset-bundle-hash").First().text = hash.ToString();
 
@@ -214,6 +226,25 @@ namespace Rawrshak
             Debug.Log("New Asset Bundle Size: " + mUntrackedAssetBundles.Count);
         }
 
+        private void AddUploadedAssetBundleForDisplay(ABData bundle)
+        {
+            // Add entry to UI
+            TemplateContainer entryTree = mUploadedBundleEntry.CloneTree();
+            entryTree.contentContainer.Query<Label>("name").First().text = bundle.mName;
+            entryTree.contentContainer.Query<Label>("hash").First().text = bundle.mHash;
+            entryTree.contentContainer.Query<Label>("date-uploaded").First().text = bundle.mUploadTimestamp;
+
+            // Select Asset Bundle Callback to show info
+            entryTree.RegisterCallback<MouseDownEvent>((evt) => {
+                bundleSelected.Invoke(bundle);;
+            });
+            
+            bundle.mVisualElement = entryTree;
+
+            // Add entry to UI
+            mUploadedAssetBundleHolder.Add(entryTree);
+        }
+
         public void LoadAssetBundle(string directory, string folderObjName)
         {
             mAssetBundleDirectory = directory;
@@ -244,23 +275,35 @@ namespace Rawrshak
             var iter = mUntrackedAssetBundles.GetEnumerator();
             while(iter.MoveNext())
             {
-                if (iter.Current.Value.mSelectedForUploading)
+                var bundle = iter.Current.Value;
+                if (bundle.mSelectedForUploading)
                 {
-                    list.Add(iter.Current.Value);
+                    list.Add(bundle);
                     
                     // Save uploaded bundle to file
-                    SaveAssetBundle(iter.Current.Value);
+                    SaveAssetBundle(bundle);
+
+                    // Save upload time
+                    bundle.mUploadTimestamp = DateTime.Now.ToString();
+                    
+                    // Remove from Untracked Bundles Section
+                    mUntrackedAssetBundleHolder.Remove(bundle.mVisualElement);
 
                     // Add uploaded bundle to dictionary
-                    mUploadedAssetBundles.Add(iter.Current.Value.mHashId, iter.Current.Value);
+                    mUploadedAssetBundles.Add(bundle.mHashId, bundle);
+
+                    // Add to Uploaded Bundles Section
+                    AddUploadedAssetBundleForDisplay(bundle);
+                    
+                    // Save the Uploaded Timestamp
+                    EditorUtility.SetDirty(bundle);
+                    AssetDatabase.SaveAssets();
                 }
             }
-            AssetDatabase.SaveAssets();
 
             // remove mUntrackedAssetBundles
             foreach (var bundle in list)
             {
-                mUntrackedAssetBundleHolder.Remove(bundle.mVisualElement);
                 mUntrackedAssetBundles.Remove(bundle.mName);
             }
 
