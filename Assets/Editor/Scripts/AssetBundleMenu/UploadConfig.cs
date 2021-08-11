@@ -18,13 +18,17 @@ namespace Rawrshak
         
         Box mHelpBoxHolder;
 
-        public void Init()
+
+        public static UploadConfig CreateInstance()
         {
-            Debug.Log("Initializing UploadManager.");
-            gatewayUri = "http://arweave.net";
-            walletFile = String.Empty;
-            walletAddress = String.Empty;
-            walletBalance = "0.0";
+            var config = ScriptableObject.CreateInstance<UploadConfig>();
+            
+            config.gatewayUri = "http://arweave.net";
+            config.walletFile = String.Empty;
+            config.walletAddress = String.Empty;
+            config.walletBalance = "0.0";
+
+            return config;
         }
     }
 }

@@ -33,7 +33,14 @@ namespace Rawrshak
         [NonSerialized] 
         public bool mSelectedForUploading;
 
-        public ABData(Hash128 hash, string name, string fileLocation, SupportedBuildTargets buildTarget)
+        public static ABData CreateInstance(Hash128 hash, string name, string fileLocation, SupportedBuildTargets buildTarget)
+        {
+            var data = ScriptableObject.CreateInstance<ABData>();
+            data.Init(hash, name, fileLocation, buildTarget);
+            return data;
+        }
+
+        private void Init(Hash128 hash, string name, string fileLocation, SupportedBuildTargets buildTarget)
         {
             mHash = hash.ToString();
             mName = name;

@@ -72,25 +72,23 @@ namespace Rawrshak
             mConfig = Resources.Load<AssetBundleMenuConfig>(String.Format("{0}/{1}", ASSET_BUNDLES_MENU_CONFIG_DIRECTORY, ASSET_BUNDLES_MENU_CONFIG_FILE));
             if (mConfig == null)
             {
-                mConfig = ScriptableObject.CreateInstance<AssetBundleMenuConfig>();
-                mConfig.Init();
+                mConfig = AssetBundleMenuConfig.CreateInstance();
                 AssetDatabase.CreateAsset(mConfig, String.Format("{0}/{1}/{2}.asset", RESOURCES_FOLDER, ASSET_BUNDLES_MENU_CONFIG_DIRECTORY, ASSET_BUNDLES_MENU_CONFIG_FILE));
             }
 
             if (mAssetBundleManager == null)
             {
-                mAssetBundleManager = ScriptableObject.CreateInstance<ABManager>();
-                mAssetBundleManager.Init(mConfig.assetBundleFolder, mConfig.buildTarget);
+                mAssetBundleManager = ABManager.CreateInstance(mConfig.assetBundleFolder, mConfig.buildTarget);
             }
 
             if (mUploadManager == null)
             {
-                mUploadManager = ScriptableObject.CreateInstance<UploadManager>();
+                mUploadManager = UploadManager.CreateInstance();
             }
 
             if (mViewer == null)
             {
-                mViewer = ScriptableObject.CreateInstance<ABViewer>();
+                mViewer = ABViewer.CreateInstance();
             }
 
             // Set BundleSelected callback

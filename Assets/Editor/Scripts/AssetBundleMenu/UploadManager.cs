@@ -25,14 +25,18 @@ namespace Rawrshak
         // Static Properties
         static string UPLOAD_CONFIG_FILE = "UploadConfig";
 
+        public static UploadManager CreateInstance()
+        {
+            return ScriptableObject.CreateInstance<UploadManager>();
+        }
+
         public void OnEnable()
         {
             Debug.Log("Initializing UploadManager.");
             mConfig = Resources.Load<UploadConfig>(String.Format("{0}/{1}", AssetBundleMenu.ASSET_BUNDLES_MENU_CONFIG_DIRECTORY, UPLOAD_CONFIG_FILE));
             if (mConfig == null)
             {
-                mConfig = ScriptableObject.CreateInstance<UploadConfig>();
-                mConfig.Init();
+                mConfig = UploadConfig.CreateInstance();
                 AssetDatabase.CreateAsset(mConfig, String.Format("{0}/{1}/{2}.asset", AssetBundleMenu.RESOURCES_FOLDER, AssetBundleMenu.ASSET_BUNDLES_MENU_CONFIG_DIRECTORY, UPLOAD_CONFIG_FILE));
             }
             AssetDatabase.SaveAssets();

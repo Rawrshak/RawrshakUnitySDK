@@ -11,11 +11,14 @@ namespace Rawrshak
         public string assetBundleFolder;
         public SupportedBuildTargets buildTarget;
 
-        public void Init()
+        public static AssetBundleMenuConfig CreateInstance()
         {
-            Debug.Log("Initializing AssetBundleMenuConfig.");
-            buildTarget = SupportedBuildTargets.StandaloneWindows;
-            assetBundleFolder = "AssetBundles/StandaloneWindows";
+            var data = ScriptableObject.CreateInstance<AssetBundleMenuConfig>();
+            
+            data.buildTarget = SupportedBuildTargets.StandaloneWindows;
+            data.assetBundleFolder = "AssetBundles/StandaloneWindows";
+
+            return data;
         }
     }
 

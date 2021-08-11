@@ -12,6 +12,9 @@ namespace Rawrshak
 {
     public class ABManager : ScriptableObject
     {
+        // Singleton instance
+        
+
         // Static Properties
         static string ASSET_BUNDLES_UPLOADED_DIRECTORY = "UploadedAssetBundles";
 
@@ -33,13 +36,14 @@ namespace Rawrshak
         VisualTreeAsset mUploadedBundleEntry;
         VisualTreeAsset mUntrackedBundleEntry;
 
-        public void Init(string directory, SupportedBuildTargets buildTarget)
+        public static ABManager CreateInstance(string directory, SupportedBuildTargets buildTarget)
         {
-            mCurrentBuildTarget = buildTarget;
-            LoadAssetBundle(directory, buildTarget);
+            var manager = ScriptableObject.CreateInstance<ABManager>();
 
-            // Todo: Load dictionary of uploaded asset bundles
-            // Todo: Load list of new asset bundles that aren't in the 'uploaded asset bundles dictionary'
+            manager.mCurrentBuildTarget = buildTarget;
+            manager.LoadAssetBundle(directory, buildTarget);
+
+            return manager;
         }
 
         public void OnEnable()
@@ -177,7 +181,7 @@ namespace Rawrshak
                         // find or add the asset bundle in the new asset bundle lists
                         // Todo: Update this to include file location
                         string fileLocation = Application.dataPath + "/" + mAssetBundleDirectory + "/" + name;
-                        ABData bundle = new ABData(hash, name, fileLocation, mCurrentBuildTarget);
+                        ABData bundle = ABData.CreateInstance(hash, name, fileLocation, mCurrentBuildTarget);
                         mUntrackedAssetBundles.Add(name, bundle);
 
                         // Add entry to UI

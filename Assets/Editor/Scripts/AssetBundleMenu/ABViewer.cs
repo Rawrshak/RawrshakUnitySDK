@@ -19,6 +19,11 @@ namespace Rawrshak
         VisualTreeAsset mBundleTreeAsset;
         UnityEvent<ABData> mCheckUploadStatusCallback = new UnityEvent<ABData>();
 
+        public static ABViewer CreateInstance()
+        {
+            return ScriptableObject.CreateInstance<ABViewer>();
+        }
+
         public void SetAssetBundle(ABData assetBundle)
         {
             mAssetBundle = assetBundle;
