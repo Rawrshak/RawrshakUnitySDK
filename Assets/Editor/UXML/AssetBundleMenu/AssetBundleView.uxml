@@ -12,10 +12,14 @@
             <engine:TextField name="name" label="Name" binding-path="mName" />
             <engine:TextField name="hash" label="Hash Id" binding-path="mHash" />
             <engine:TextField name="local-file-location" label="Local File Location" binding-path="mFileLocation" />
+            <editor:EnumField name="build-target" label="Build Target" binding-path="mBuildTarget" />
+            <editor:EnumField name="engine" label="Engine" binding-path="mEngine" />
+            <engine:TextField name="unity-version" label="Unity Version" binding-path="mUnityVersion" />
             <engine:TextField name="transaction-id" label="Transaction Id" binding-path="mTransactionId" />
             <engine:TextField name="uri" label="Uri" binding-path="mUri" />
             <engine:TextField name="upload-timestamp" label="Upload Timestamp" binding-path="mUploadTimestamp" />
             <engine:TextField name="uploader-address" label="Uploader Address" binding-path="mUploaderAddress" />
+            <editor:IntegerField name="confirmations" label="Block Confirmations" binding-path="mNumOfConfirmations" />
             <editor:IntegerField name="file-size" label="File Size (bytes)" binding-path="mFileSize" />
             <editor:PropertyField name="assets" label="Asset Names" binding-path="mAssets" />
         </engine:ScrollView >

@@ -19,6 +19,9 @@ namespace Rawrshak
         public string mUploaderAddress;
         public List<string> mAssets;
         public Int64 mFileSize;
+        public SupportedBuildTargets mBuildTarget;
+        public SupportedEngine mEngine = SupportedEngine.Unity;
+        public string mUnityVersion;
 
         // Non-Serialized Data
         [NonSerialized]
@@ -30,7 +33,7 @@ namespace Rawrshak
         [NonSerialized] 
         public bool mSelectedForUploading;
 
-        public ABData(Hash128 hash, string name, string fileLocation)
+        public ABData(Hash128 hash, string name, string fileLocation, SupportedBuildTargets buildTarget)
         {
             mHash = hash.ToString();
             mName = name;
@@ -45,6 +48,8 @@ namespace Rawrshak
             mMarkedForDelete = false;
             mUploadTimestamp = String.Empty;
             mUploaderAddress = String.Empty;
+            mBuildTarget = buildTarget;
+            mUnityVersion = Application.unityVersion;
             UpdateFileSize();
             UpdateAssetNames();
         }

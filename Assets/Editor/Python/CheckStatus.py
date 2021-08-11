@@ -46,6 +46,8 @@ try:
     # Update the status in the UI
     if status == "PENDING":
         bundle.mStatus = "Uploading..."
+    elif status == "ERROR": 
+        bundle.mStatus = "Error: Transaction Not Found"
     else:
         bundle.mStatus = "Uploaded"
         bundle.mNumOfConfirmations = status['number_of_confirmations']
@@ -53,12 +55,12 @@ try:
         # Todo: Query for the transaction block and the block timestamp
     
 except TransactionUploaderException as tue:
-    print(tue.args)
-    menu.AddErrorHelpbox(tue.args)
+    print(tue.message)
+    menu.AddErrorHelpbox(tue.message)
 except ArweaveTransactionException as ae:
-    print(ae.args)
-    menu.AddErrorHelpbox(ae.args)
+    print(ae.message)
+    menu.AddErrorHelpbox(ae.message)
 except Exception as e:
-    print(e.args)
-    menu.AddErrorHelpbox(e.args)
+    print(e.args[0])
+    menu.AddErrorHelpbox(e.args[0])
 

@@ -8,7 +8,7 @@
     <engine:Box name="asset-bundle-box" style="flex-direction: Row; font-size: 12px;" >
         <engine:Label name="asset-bundle-name" style="width: 30%;"/>
         <engine:Label name="asset-bundle-hash" style="width: 65%;"/>
-        <engine:Toggle name="asset-bundle-selected" value="true" />
+        <engine:Toggle name="asset-bundle-selected" value="false" />
     </engine:Box> 
     
 </engine:UXML>

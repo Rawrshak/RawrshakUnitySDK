@@ -80,7 +80,7 @@ namespace Rawrshak
             if (mAssetBundleManager == null)
             {
                 mAssetBundleManager = ScriptableObject.CreateInstance<ABManager>();
-                mAssetBundleManager.Init(mConfig.assetBundleFolder, mConfig.buildTarget.ToString());
+                mAssetBundleManager.Init(mConfig.assetBundleFolder, mConfig.buildTarget);
             }
 
             if (mUploadManager == null)
@@ -131,7 +131,7 @@ namespace Rawrshak
                 so.FindProperty("assetBundleFolder").stringValue = newDirectory;
                 so.ApplyModifiedProperties();
 
-                mAssetBundleManager.LoadAssetBundle(newDirectory, newTarget.ToString());
+                mAssetBundleManager.LoadAssetBundle(newDirectory, newTarget);
                 mAssetBundleManager.ReloadUntrackedAssetBundles();
             });
             
@@ -144,7 +144,7 @@ namespace Rawrshak
                 CreateAssetBundles.BuildAllAssetBundles(mConfig.buildTarget, mConfig.assetBundleFolder);
                 
                 // Refresh New Asset Bundles
-                mAssetBundleManager.LoadAssetBundle(mConfig.assetBundleFolder, mConfig.buildTarget.ToString());
+                mAssetBundleManager.LoadAssetBundle(mConfig.assetBundleFolder, mConfig.buildTarget);
                 mAssetBundleManager.ReloadUntrackedAssetBundles();
             };
             

@@ -21,6 +21,7 @@ namespace Rawrshak
         private AssetBundleManifest mManifest; // Asset Bundle Folder Manifest Object
         private UnityEvent<ABData> bundleSelected = new UnityEvent<ABData>();
         private UnityEvent<List<ABData>> mUploadBundleCallback = new UnityEvent<List<ABData>>();
+        private SupportedBuildTargets mCurrentBuildTarget;
 
         Dictionary<string, ABData> mUntrackedAssetBundles;
         Dictionary<Hash128, ABData> mUploadedAssetBundles;
@@ -32,16 +33,17 @@ namespace Rawrshak
         VisualTreeAsset mUploadedBundleEntry;
         VisualTreeAsset mUntrackedBundleEntry;
 
-        public void Init(string directory, string folderObjName)
+        public void Init(string directory, SupportedBuildTargets buildTarget)
         {
-            LoadAssetBundle(directory, folderObjName);
+            mCurrentBuildTarget = buildTarget;
+            LoadAssetBundle(directory, buildTarget);
 
             // Todo: Load dictionary of uploaded asset bundles
             // Todo: Load list of new asset bundles that aren't in the 'uploaded asset bundles dictionary'
         }
 
         public void OnEnable()
-        {            
+        {
             mUntrackedAssetBundles = new Dictionary<string, ABData>();
             mUploadedAssetBundles = new Dictionary<Hash128, ABData>();
 
@@ -166,6 +168,7 @@ namespace Rawrshak
                         bundle.mVisualElement.contentContainer.Query<Label>("asset-bundle-hash").First().text = hash.ToString();
                         bundle.mVisualElement.contentContainer.Query<Toggle>("asset-bundle-selected").First().value = false;
                         bundle.mMarkedForDelete = false;
+                        bundle.mBuildTarget = mCurrentBuildTarget;
                         bundle.UpdateAssetNames();
                         bundle.UpdateFileSize();
                     }
@@ -174,7 +177,7 @@ namespace Rawrshak
                         // find or add the asset bundle in the new asset bundle lists
                         // Todo: Update this to include file location
                         string fileLocation = Application.dataPath + "/" + mAssetBundleDirectory + "/" + name;
-                        ABData bundle = new ABData(hash, name, fileLocation);
+                        ABData bundle = new ABData(hash, name, fileLocation, mCurrentBuildTarget);
                         mUntrackedAssetBundles.Add(name, bundle);
 
                         // Add entry to UI
@@ -245,16 +248,18 @@ namespace Rawrshak
             mUploadedAssetBundleHolder.Add(entryTree);
         }
 
-        public void LoadAssetBundle(string directory, string folderObjName)
+        public void LoadAssetBundle(string directory, SupportedBuildTargets builtTarget)
         {
             mAssetBundleDirectory = directory;
+            mCurrentBuildTarget = builtTarget;
             Debug.Log("Load Asset Bundle: " + directory);
             if (mFolderObj != null)
             {
                 mFolderObj.Unload(true);  
                 mManifest = null; 
             }
-
+            
+            string folderObjName = builtTarget.ToString();
             if (File.Exists("Assets/" + mAssetBundleDirectory + "/" + folderObjName))
             {
                 Debug.Log("Folder Exists! " + mAssetBundleDirectory + "/" + folderObjName);

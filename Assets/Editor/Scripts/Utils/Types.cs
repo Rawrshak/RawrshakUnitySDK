@@ -14,6 +14,7 @@ namespace Rawrshak {
         Kovan,
         Localhost
     };
+
     public enum SupportedBuildTargets {
         StandaloneWindows,
         StandaloneWindows64,
@@ -22,6 +23,10 @@ namespace Rawrshak {
         WebGL
     };
 
+    public enum SupportedEngine {
+        Unity
+    };
+    
     // [Flags]
     public enum Role
     {
