@@ -34,3 +34,13 @@ sysinfo.txt
 ehthumbs.db
 [Tt]humbs.db
 [Dd]esktop.ini
+
+# ================== #
+# Rawrshak generated #
+# ================== #
+/Assets/Editor/Resources
+/Assets/Editor/Resources.meta
+/Assets/AssetBundles.meta
+/Assets/AssetBundles
+/Assets/Editor/Scripts/TempScripts
+/Assets/Editor/Scripts/TempScripts.meta
