@@ -113,18 +113,8 @@ namespace Rawrshak
 
             var uploadButton = root.Query<Button>("upload-button").First();
             uploadButton.clicked += () => {
-                // Todo: Get Config a better way
-                var config = Resources.FindObjectsOfTypeAll(typeof(UploadConfig));
-                if (config[0] != null)
-                {
-                    if (String.IsNullOrEmpty(((UploadConfig)config[0]).walletAddress))
-                    {
-                        AddErrorHelpbox("No Wallet Loaded.");
-                        return;
-                    }
-                    var list = BuildUploadList();
-                    mUploadBundleCallback.Invoke(list);
-                }
+                var list = BuildUploadList();
+                mUploadBundleCallback.Invoke(list);
             };
             
             ReloadUntrackedAssetBundles();
@@ -292,8 +282,8 @@ namespace Rawrshak
                     // Save uploaded bundle to file
                     SaveAssetBundle(bundle);
 
-                    // Save upload time
-                    bundle.mUploadTimestamp = DateTime.Now.ToString();
+                    // // Save upload time
+                    // bundle.mUploadTimestamp = DateTime.Now.ToString();
                     
                     // Remove from Untracked Bundles Section
                     mUntrackedAssetBundleHolder.Remove(bundle.mVisualElement);
@@ -301,12 +291,14 @@ namespace Rawrshak
                     // Add uploaded bundle to dictionary
                     mUploadedAssetBundles.Add(bundle.mHashId, bundle);
 
+                    // Todo: Move the following to after the file has been uploaded properly
                     // Add to Uploaded Bundles Section
                     AddUploadedAssetBundleForDisplay(bundle);
                     
                     // Save the Uploaded Timestamp
                     EditorUtility.SetDirty(bundle);
                     AssetDatabase.SaveAssets();
+                    Debug.Log("Finished Uploading Asset Bundle: " + bundle.mName);
                 }
             }
 
