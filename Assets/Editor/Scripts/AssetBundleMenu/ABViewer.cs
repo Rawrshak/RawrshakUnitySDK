@@ -5,6 +5,7 @@ using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.Events;
+using Unity.EditorCoroutines.Editor;
 
 namespace Rawrshak
 {
@@ -15,6 +16,7 @@ namespace Rawrshak
         // UI
         Box mHelpBoxHolder;
         Box mViewer;
+        Button mVerifyButton;
         
         VisualTreeAsset mBundleTreeAsset;
         UnityEvent<ABData> mCheckUploadStatusCallback = new UnityEvent<ABData>();
@@ -47,6 +49,20 @@ namespace Rawrshak
                 mCheckUploadStatusCallback.Invoke(mAssetBundle);
             };
 
+            // Verify Button
+            mVerifyButton = bundleTree.contentContainer.Query<Button>("verify-asset-bundle-button").First();
+            if (mAssetBundle.mStatus == "Uploaded")
+            {
+                mVerifyButton.SetEnabled(true);
+                mVerifyButton.clicked += () => {
+                    EditorCoroutineUtility.StartCoroutine(Verify(mAssetBundle), this);
+                };
+            }
+            else
+            {
+                mVerifyButton.SetEnabled(false);
+            }
+
             mViewer.Add(bundleTree);
         }
 
@@ -69,6 +85,22 @@ namespace Rawrshak
         public void AddErrorHelpbox(string errorMsg)
         {
             mHelpBoxHolder.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
+        }
+
+        private IEnumerator Verify(ABData bundle)
+        {
+            // Todo: Verify Status
+            // Todo: Verify Confirmations > 10;
+            // Todo: Download Uri Asset Bundle
+            // Todo: Verify Hash
+            yield return null;
+        }
+
+        private IEnumerator QueryUploadCost(ABData bundle)
+        {
+            // Todo: Implement this when you have the Estimate Cost API
+            bundle.mUploadCost = 0.0f;
+            yield return null;
         }
     }
 

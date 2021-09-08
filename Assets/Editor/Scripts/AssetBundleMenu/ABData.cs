@@ -22,6 +22,8 @@ namespace Rawrshak
         public SupportedBuildTargets mBuildTarget;
         public SupportedEngine mEngine = SupportedEngine.Unity;
         public string mUnityVersion;
+        public int mVersion;
+        public float mUploadCost;
 
         // Non-Serialized Data
         [NonSerialized]
@@ -57,6 +59,8 @@ namespace Rawrshak
             mUploaderAddress = String.Empty;
             mBuildTarget = buildTarget;
             mUnityVersion = Application.unityVersion;
+            mVersion = 0;
+            mUploadCost = 0.0f;
             UpdateFileSize();
             UpdateAssetNames();
         }

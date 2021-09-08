@@ -12,9 +12,6 @@ namespace Rawrshak
     public class UploadConfig : ScriptableObject
     {
         public string gatewayUri;
-
-        // Todo: Remove Wallet file. Request Wallet Address and Wallet Balance API
-        public string walletFile;
         public string walletAddress;
         public string walletBalance;
 
@@ -31,7 +28,6 @@ namespace Rawrshak
             var config = ScriptableObject.CreateInstance<UploadConfig>();
             
             config.gatewayUri = "http://arweave.net";
-            config.walletFile = String.Empty;
             config.walletAddress = String.Empty;
             config.walletBalance = "0.0";
             config.dwsBucketName = String.Empty;

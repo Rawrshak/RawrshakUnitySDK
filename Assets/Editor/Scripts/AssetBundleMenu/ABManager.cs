@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.EditorCoroutines.Editor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
@@ -25,6 +26,7 @@ namespace Rawrshak
         private UnityEvent<ABData> bundleSelected = new UnityEvent<ABData>();
         private UnityEvent<List<ABData>> mUploadBundleCallback = new UnityEvent<List<ABData>>();
         private SupportedBuildTargets mCurrentBuildTarget;
+        private float mEstimatedTotalCost;
 
         Dictionary<string, ABData> mUntrackedAssetBundles;
         Dictionary<Hash128, ABData> mUploadedAssetBundles;
@@ -33,6 +35,7 @@ namespace Rawrshak
         Box mUntrackedAssetBundleHolder;
         Box mUploadedAssetBundleHolder;
         Box mHelpBoxHolder;
+        Label mEstimatedTotalCostLabel;
         VisualTreeAsset mUploadedBundleEntry;
         VisualTreeAsset mUntrackedBundleEntry;
 
@@ -116,6 +119,8 @@ namespace Rawrshak
                 var list = BuildUploadList();
                 mUploadBundleCallback.Invoke(list);
             };
+
+            mEstimatedTotalCostLabel = root.Query<Label>("estimated-cost").First();
             
             ReloadUntrackedAssetBundles();
 
@@ -169,7 +174,6 @@ namespace Rawrshak
                     else
                     {
                         // find or add the asset bundle in the new asset bundle lists
-                        // Todo: Update this to include file location
                         string fileLocation = Application.dataPath + "/" + mAssetBundleDirectory + "/" + name;
                         ABData bundle = ABData.CreateInstance(hash, name, fileLocation, mCurrentBuildTarget);
                         mUntrackedAssetBundles.Add(name, bundle);
@@ -183,6 +187,9 @@ namespace Rawrshak
                         var selectedToggle = entryTree.contentContainer.Query<Toggle>("asset-bundle-selected").First();
                         selectedToggle.RegisterCallback<ChangeEvent<bool>>((evt) => {
                             bundle.mSelectedForUploading = (evt.target as Toggle).value;
+
+                            // If Bundle is selected, get the estimated cost and add it to total cost;
+                            EditorCoroutineUtility.StartCoroutine(UpdateEstimatedCost(bundle, bundle.mSelectedForUploading), this);
                         });
 
                         // Select Asset Bundle Callback to show info
@@ -229,7 +236,9 @@ namespace Rawrshak
             TemplateContainer entryTree = mUploadedBundleEntry.CloneTree();
             entryTree.contentContainer.Query<Label>("name").First().text = bundle.mName;
             entryTree.contentContainer.Query<Label>("hash").First().text = bundle.mHash;
-            entryTree.contentContainer.Query<Label>("date-uploaded").First().text = bundle.mUploadTimestamp;
+
+            // Have "Uploading" as the status until it's finished uploading.
+            entryTree.contentContainer.Query<Label>("date-uploaded").First().text = bundle.mStatus;
 
             // Select Asset Bundle Callback to show info
             entryTree.RegisterCallback<MouseDownEvent>((evt) => {
@@ -282,8 +291,8 @@ namespace Rawrshak
                     // Save uploaded bundle to file
                     SaveAssetBundle(bundle);
 
-                    // // Save upload time
-                    // bundle.mUploadTimestamp = DateTime.Now.ToString();
+                    // Set upload status
+                    bundle.mStatus = "Uploading..";
                     
                     // Remove from Untracked Bundles Section
                     mUntrackedAssetBundleHolder.Remove(bundle.mVisualElement);
@@ -298,7 +307,6 @@ namespace Rawrshak
                     // Save the Uploaded Timestamp
                     EditorUtility.SetDirty(bundle);
                     AssetDatabase.SaveAssets();
-                    Debug.Log("Finished Uploading Asset Bundle: " + bundle.mName);
                 }
             }
 
@@ -327,6 +335,14 @@ namespace Rawrshak
             {
                 AssetDatabase.CreateAsset(bundle, storageFile);
             }
+        }
+
+        private IEnumerator UpdateEstimatedCost(ABData bundle, bool isSelected)
+        {
+            // Todo: Implement this when you have the Estimate Cost API
+            mEstimatedTotalCost += (isSelected) ? 10.0f : -10.0f;
+            mEstimatedTotalCostLabel.text = String.Format("{0} AR", mEstimatedTotalCost.ToString("n2"));
+            yield return null;
         }
     }
 }

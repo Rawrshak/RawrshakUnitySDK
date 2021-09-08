@@ -81,32 +81,8 @@ namespace Rawrshak
                 AddErrorHelpbox("No DWS Bucket Name Set");
                 return;
             }
-
-            foreach(var bundle in bundles)
-            {
-                Debug.Log("Uploading bundle: " + bundle.mName);
-                EditorCoroutineUtility.StartCoroutine(UploadAssetBundle(bundle), this);
-            }
-
-            /******/
-            /* The following is specific to Python Gateway upload
-            /******/
-
-            // foreach(var bundle in bundles)
-            // {
-            //     bundleForUpload = bundle;
-            //     Debug.Log("Uploading bundle: " + bundleForUpload.mName);
-                
-            //     // This has to be synchronous because the python script reads 
-            //     // off of the bundle listed here. You might want to just have
-            //     // the python script load the entire bundle list and upload instead
-            //     // of doing it one by one. At which point, you can rever this back
-            //     // to a coroutine
-            //     // Todo: Update script to upload the entire list of bundle instead
-            //     // of doing this one by one. 
-            //     UploadAssetBundle();
-            //     // EditorCoroutineUtility.StartCoroutine(UploadAssetBundle(), this);
-            // }
+            
+            EditorCoroutineUtility.StartCoroutine(UploadAssetBundle(bundles), this);
         }
 
         public void CheckUploadStatus(ABData bundle)
@@ -116,112 +92,108 @@ namespace Rawrshak
             // check status
             EditorCoroutineUtility.StartCoroutine(CheckStatus(), this);
         }
+
+        IEnumerator CheckStatus()
+        {
+            // Todo: Implement this when you have the Wallet API
+            yield return null;
+        }
         
         IEnumerator LoadWallet()
         {
-            PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/VerifyArweaveConnection.py");
+            // Todo: Implement this when you have the Wallet API
             yield return null;
         }
         
         IEnumerator RefreshBalance()
         {
-            if (String.IsNullOrEmpty(mConfig.walletAddress))
-            {
-                AddErrorHelpbox("No Wallet Loaded.");
-                yield break;
-            }
-            PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/RefreshWalletBalance.py");
+            // Todo: Implement this when you have the Wallet API
             yield return null;
         }
 
-        IEnumerator UploadAssetBundle(ABData bundle)
+        IEnumerator UploadAssetBundle(List<ABData> bundles)
         {
-            string filePath = bundle.mName;
-            if (!String.IsNullOrEmpty(mConfig.dwsFolderPath))
+            foreach(var bundle in bundles)
             {
-                filePath = string.Format("{0}/{1}", mConfig.dwsFolderPath, filePath);
-            }
-            string uri = String.Format("{0}/{1}/{2}", uploadBaseUrl, mConfig.dwsBucketName, filePath);
+                Debug.Log("Uploading bundle: " + bundle.mName);
 
-            Debug.Log("Uri: " + uri);
-
-            // // Upload the file
-            using (var uwr = new UnityWebRequest(uri, UnityWebRequest.kHttpVerbPOST))
-            {
-                // Set API key header
-                uwr.SetRequestHeader("X-APIKey", mConfig.dwsApiKey);
-
-                // Create Upload File Handler and set it to the file location
-                uwr.uploadHandler = new UploadHandlerFile(bundle.mFileLocation);
-                uwr.uploadHandler.contentType = "application/octet-stream";
-
-                uwr.downloadHandler = new DownloadHandlerBuffer();
-
-                // Send unity request
-                UnityWebRequestAsyncOperation request = uwr.SendWebRequest();
-                
-                float progress = 0.0f;
-                while (!request.isDone)
+                string filePath = bundle.mName;
+                if (!String.IsNullOrEmpty(mConfig.dwsFolderPath))
                 {
-                    if (progress < request.progress)
+                    filePath = string.Format("{0}/{1}", mConfig.dwsFolderPath, filePath);
+                }
+                string uri = String.Format("{0}/{1}/{2}", uploadBaseUrl, mConfig.dwsBucketName, filePath);
+
+                Debug.Log("Uri: " + uri);
+
+                // Upload the file
+                using (var uwr = new UnityWebRequest(uri, UnityWebRequest.kHttpVerbPOST))
+                {
+                    // Set API key header
+                    uwr.SetRequestHeader("X-APIKey", mConfig.dwsApiKey);
+
+                    // Create Upload File Handler and set it to the file location
+                    uwr.uploadHandler = new UploadHandlerFile(bundle.mFileLocation);
+                    uwr.uploadHandler.contentType = "application/octet-stream";
+
+                    uwr.downloadHandler = new DownloadHandlerBuffer();
+
+                    // Send unity request
+                    UnityWebRequestAsyncOperation request = uwr.SendWebRequest();
+                    
+                    float progress = 0.0f;
+                    while (!request.isDone)
                     {
-                        progress = request.progress;
-                        Debug.Log(request.progress);
+                        if (progress < request.progress)
+                        {
+                            progress = request.progress;
+                            Debug.Log(request.progress);
+                        }
+                        yield return null;
                     }
-                    yield return null;
-                }
-                Debug.Log("Upload Finished!");
+                    Debug.Log("Upload Finished!");
 
-                if (uwr.result != UnityWebRequest.Result.Success)
-                    Debug.LogError(uwr.error);
-                else
-                {
-                    // Print Body
-                    var responseBody = UploadResponse.Parse(uwr.downloadHandler.text);
-                    // Debug.Log(uwr.downloadHandler.text);
+                    if (uwr.result != UnityWebRequest.Result.Success)
+                        Debug.LogError(uwr.error);
+                    else
+                    {
+                        // Print Body
+                        // Debug.Log(uwr.downloadHandler.text);
+                        var responseBody = UploadResponse.Parse(uwr.downloadHandler.text);
 
-                    bundle.mTransactionId = responseBody.transactionId;
+                        // Update Bundle information
+                        bundle.mTransactionId = responseBody.transactionId;
+                        bundle.mUri = String.Format("{0}/{1}", mConfig.gatewayUri, responseBody.transactionId);
+                        bundle.mUploadTimestamp = DateTime.Now.ToString();
+                        bundle.mNumOfConfirmations = responseBody.status.confirmed.number_of_confirmations;
+                        bundle.mVersion = responseBody.version;
+                        Debug.Log("Version: " + responseBody.version);
 
-                    // Todo: replace this with the Arweave.Net gateway
-                    bundle.mUri = String.Format("http://159.203.158.0/{0}", responseBody.transactionId);
-                    // bundle.mUri = String.Format("https://arweave.net/{0}", responseBody.transactionId);
+                        bundle.mStatus = "Uploaded";
 
-                    // Save upload time
-                    bundle.mUploadTimestamp = DateTime.Now.ToString();
-                    bundle.mNumOfConfirmations = responseBody.status.confirmed.number_of_confirmations;
-                    Debug.Log("Version: " + responseBody.version);
+                        UpdateBundleEntry(bundle);
 
-                    // Todo: Move Asset Bundle to "Uploaded Section"
-                    // Todo: Save asset bundle file
+                        // Make sure this file will get saved properly
+                        EditorUtility.SetDirty(bundle);
+                    }
                 }
             }
-        }
 
-        // // Todo: revert this back to a coroutine
-        // void UploadAssetBundle()
-        // {
-        //     if (String.IsNullOrEmpty(mConfig.walletAddress))
-        //     {
-        //         AddErrorHelpbox("No Wallet Loaded.");
-        //         // yield break;
-        //     }
-        //     PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/UploadAssetBundle.py");
-        //     // yield return null;
-
-        //     // Save the info that the python scripts updated
-        //     EditorUtility.SetDirty(bundleForUpload);
-        //     AssetDatabase.SaveAssets();
-        // }
-
-        IEnumerator CheckStatus()
-        {
-            PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/CheckStatus.py");
-            yield return null;
+            // Save file
+            AssetDatabase.SaveAssets();
         }
 
         public void AddErrorHelpbox(string errorMsg)
         {
             mHelpBoxHolder.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
+        }
+
+        private void UpdateBundleEntry(ABData bundle)
+        {
+            if (bundle.mVisualElement != null)
+            {
+                bundle.mVisualElement.contentContainer.Query<Label>("date-uploaded").First().text = bundle.mUploadTimestamp;
+            }
         }
     }
 }

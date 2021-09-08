@@ -30,7 +30,6 @@
                         <engine:Label binding-path="walletBalance" />
                     </engine:Box>
                     <engine:TextField label="Arweave Gateway URI" binding-path="gatewayUri" />
-                    <engine:TextField label="Wallet File Location" binding-path="walletFile" />
                     <engine:TextField label="DWS Api Key" binding-path="dwsApiKey" />
                     <engine:TextField label="DWS Bucket Name" binding-path="dwsBucketName" />
                     <engine:TextField label="DWS Folder Path" binding-path="dwsFolderPath" />
@@ -51,6 +50,11 @@
                         <engine:Box name="new-entries" />
                         
                         <engine:Button name="upload-button" text="Upload To Storage" />
+                    
+                        <engine:Box style="flex-direction: Row;" >
+                            <engine:Label text="Estimated Cost" style="width: 30%; -unity-text-align: middle-left; font-size: 14px;"  />
+                            <engine:Label name="estimated-cost" text="0.0 AR" style="width: 70%; -unity-text-align: middle-right; font-size: 14px;" />
+                        </engine:Box> 
                 </engine:Foldout>
                 
                 <engine:Foldout class="foldout-style" name="uploaded-asset-bundles" text="Uploaded Asset Bundles">
