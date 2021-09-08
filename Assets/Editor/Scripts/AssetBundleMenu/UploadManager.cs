@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
-using UnityEditor.Scripting.Python;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 using UnityEngine.Networking;
