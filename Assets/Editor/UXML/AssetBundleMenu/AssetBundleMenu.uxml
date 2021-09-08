@@ -29,13 +29,16 @@
                         <engine:Label text="Wallet Balance: " />
                         <engine:Label binding-path="walletBalance" />
                     </engine:Box>
+                    <engine:Box style="flex-direction: Row;" >
+                        <engine:Label text="Wallet Fiat Balance: " />
+                        <engine:Label binding-path="walletFiatBalance" />
+                    </engine:Box>
                     <engine:TextField label="Arweave Gateway URI" binding-path="gatewayUri" />
                     <engine:TextField label="DWS Api Key" binding-path="dwsApiKey" />
                     <engine:TextField label="DWS Bucket Name" binding-path="dwsBucketName" />
                     <engine:TextField label="DWS Folder Path" binding-path="dwsFolderPath" />
                     <engine:Box style="flex-direction: Row;" >
                         <engine:Button name="load-wallet-button" text="Load Wallet" style="flex-grow: 1; -unity-text-align: middle-center; font-size: 14px;" />
-                        <engine:Button name="refresh-balance-button" text="Refresh Balance" style="flex-grow: 1; -unity-text-align: middle-center; font-size: 14px;" />
                     </engine:Box>
                 </engine:Foldout>
 

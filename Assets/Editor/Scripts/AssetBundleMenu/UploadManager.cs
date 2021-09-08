@@ -13,7 +13,9 @@ namespace Rawrshak
 {
     public class UploadManager : ScriptableObject
     {
-        static string uploadBaseUrl = "https://dwsserver-rx5q3vrrpa-uk.a.run.app/api/bucket";
+        static string uploadApiBaseUrl = "https://dwsserver-rx5q3vrrpa-uk.a.run.app/api/bucket";
+        static string walletApiBaseUrl = "https://dwsserver-rx5q3vrrpa-uk.a.run.app/api/wallet/arweave";
+
         public ABData bundleForUpload;
         public ABData bundleToCheckStatus;
 
@@ -49,15 +51,14 @@ namespace Rawrshak
             var uploadSettingsFoldout = root.Query<Foldout>("upload-settings").First();
             SerializedObject so = new SerializedObject(mConfig);
             uploadSettingsFoldout.Bind(so);
-
-            var refreshBalanceButton = root.Query<Button>("refresh-balance-button").First();
-            refreshBalanceButton.clicked += () => {
-                EditorCoroutineUtility.StartCoroutine(RefreshBalance(), this);
-            };
             
             var loadWalletButton = root.Query<Button>("load-wallet-button").First();
+            if (!String.IsNullOrEmpty(mConfig.walletAddress))
+            {
+                loadWalletButton.text = "Refresh Balance";
+            }
             loadWalletButton.clicked += () => {
-                EditorCoroutineUtility.StartCoroutine(LoadWallet(), this);
+                EditorCoroutineUtility.StartCoroutine(LoadWallet(loadWalletButton), this);
             };
             
             if (String.IsNullOrEmpty(mConfig.walletAddress))
@@ -94,22 +95,47 @@ namespace Rawrshak
 
         IEnumerator CheckStatus()
         {
-            // Todo: Implement this when you have the Wallet API
+            // Todo: This checks whether or not the asset is now available. (> X number of confirmations)
             yield return null;
         }
         
-        IEnumerator LoadWallet()
+        IEnumerator LoadWallet(Button button)
         {
-            // Todo: Implement this when you have the Wallet API
-            yield return null;
-        }
-        
-        IEnumerator RefreshBalance()
-        {
-            // Todo: Implement this when you have the Wallet API
-            yield return null;
-        }
+            using (UnityWebRequest uwr = UnityWebRequest.Get(walletApiBaseUrl))
+            {
+                // Set API key header
+                uwr.SetRequestHeader("X-APIKey", mConfig.dwsApiKey);
+                // uwr.downloadHandler = new DownloadHandlerBuffer();
 
+                // Request and wait for the desired page.
+                yield return uwr.SendWebRequest();
+
+                if (uwr.result != UnityWebRequest.Result.Success)
+                    Debug.LogError(uwr.error);
+                else
+                {
+                    // Print Body
+                    Debug.Log(uwr.downloadHandler.text);
+                    var body = WalletResponse.Parse(uwr.downloadHandler.text);
+
+                    mConfig.walletAddress = body.address;
+                    // mConfig.walletBalance = String.Format("{0} AR", body.balance.ToString("n2"));
+                    mConfig.walletBalance = String.Format("{0} AR", body.balance);
+                    mConfig.walletFiatBalance = String.Format("{0} {1}", body.fiatBalance.ToString("n2"), body.fiat);
+
+                    // Make sure this file will get saved properly
+                    EditorUtility.SetDirty(mConfig);
+                    AssetDatabase.SaveAssets();
+                }
+            }
+
+            if (!String.IsNullOrEmpty(mConfig.walletAddress))
+            {
+                button.text = "Refresh Balance";
+            }
+
+            yield return null;
+        }
         IEnumerator UploadAssetBundle(List<ABData> bundles)
         {
             foreach(var bundle in bundles)
@@ -121,7 +147,7 @@ namespace Rawrshak
                 {
                     filePath = string.Format("{0}/{1}", mConfig.dwsFolderPath, filePath);
                 }
-                string uri = String.Format("{0}/{1}/{2}", uploadBaseUrl, mConfig.dwsBucketName, filePath);
+                string uri = String.Format("{0}/{1}/{2}", uploadApiBaseUrl, mConfig.dwsBucketName, filePath);
 
                 Debug.Log("Uri: " + uri);
 
@@ -158,15 +184,15 @@ namespace Rawrshak
                     {
                         // Print Body
                         // Debug.Log(uwr.downloadHandler.text);
-                        var responseBody = UploadResponse.Parse(uwr.downloadHandler.text);
+                        var body = UploadResponse.Parse(uwr.downloadHandler.text);
 
                         // Update Bundle information
-                        bundle.mTransactionId = responseBody.transactionId;
-                        bundle.mUri = String.Format("{0}/{1}", mConfig.gatewayUri, responseBody.transactionId);
+                        bundle.mTransactionId = body.transactionId;
+                        bundle.mUri = String.Format("{0}/{1}", mConfig.gatewayUri, body.transactionId);
                         bundle.mUploadTimestamp = DateTime.Now.ToString();
-                        bundle.mNumOfConfirmations = responseBody.status.confirmed.number_of_confirmations;
-                        bundle.mVersion = responseBody.version;
-                        Debug.Log("Version: " + responseBody.version);
+                        bundle.mNumOfConfirmations = body.status.confirmed.number_of_confirmations;
+                        bundle.mVersion = body.version;
+                        Debug.Log("Version: " + body.version);
 
                         bundle.mStatus = "Uploaded";
 

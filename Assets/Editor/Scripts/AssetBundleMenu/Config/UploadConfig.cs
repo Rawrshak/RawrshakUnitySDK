@@ -13,6 +13,7 @@ namespace Rawrshak
         public string gatewayUri;
         public string walletAddress;
         public string walletBalance;
+        public string walletFiatBalance;
 
         // DWS
         public string dwsBucketName;
@@ -28,7 +29,8 @@ namespace Rawrshak
             
             config.gatewayUri = "http://arweave.net";
             config.walletAddress = String.Empty;
-            config.walletBalance = "0.0";
+            config.walletBalance = "0.0 AR";
+            config.walletFiatBalance = "0.00 USD";
             config.dwsBucketName = String.Empty;
             config.dwsFolderPath = String.Empty;
             config.dwsApiKey = String.Empty;

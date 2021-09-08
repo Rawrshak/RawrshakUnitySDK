@@ -300,7 +300,6 @@ namespace Rawrshak
                     // Add uploaded bundle to dictionary
                     mUploadedAssetBundles.Add(bundle.mHashId, bundle);
 
-                    // Todo: Move the following to after the file has been uploaded properly
                     // Add to Uploaded Bundles Section
                     AddUploadedAssetBundleForDisplay(bundle);
                     
