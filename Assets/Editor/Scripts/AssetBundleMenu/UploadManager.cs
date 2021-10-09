@@ -1,4 +1,3 @@
-
 using System;
 using System.IO;
 using System.Collections;
@@ -6,14 +5,17 @@ using System.Collections.Generic;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
-using UnityEditor.Scripting.Python;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
+using UnityEngine.Networking;
 
 namespace Rawrshak
 {
     public class UploadManager : ScriptableObject
     {
+        static string uploadApiBaseUrl = "https://dwsserver-rx5q3vrrpa-uk.a.run.app/api/bucket";
+        static string walletApiBaseUrl = "https://dwsserver-rx5q3vrrpa-uk.a.run.app/api/wallet/arweave";
+
         public ABData bundleForUpload;
         public ABData bundleToCheckStatus;
 
@@ -49,26 +51,16 @@ namespace Rawrshak
             var uploadSettingsFoldout = root.Query<Foldout>("upload-settings").First();
             SerializedObject so = new SerializedObject(mConfig);
             uploadSettingsFoldout.Bind(so);
-
-            var refreshBalanceButton = root.Query<Button>("refresh-balance-button").First();
-            refreshBalanceButton.clicked += () => {
-                EditorCoroutineUtility.StartCoroutine(RefreshBalance(), this);
-            };
             
             var loadWalletButton = root.Query<Button>("load-wallet-button").First();
+            if (!String.IsNullOrEmpty(mConfig.walletAddress))
+            {
+                loadWalletButton.text = "Refresh Balance";
+            }
             loadWalletButton.clicked += () => {
-                EditorCoroutineUtility.StartCoroutine(LoadWallet(), this);
+                EditorCoroutineUtility.StartCoroutine(LoadWallet(loadWalletButton), this);
             };
             
-            // var uploadButton = root.Query<Button>("upload-button").First();
-            // uploadButton.clicked += () => {
-            //     UploadAssetBundles();
-
-            //     // Update UI
-            //     Refresh();
-            //     RefreshUploadedAssetBundlesBox();
-            // };
-
             if (String.IsNullOrEmpty(mConfig.walletAddress))
             {
                 HelpBox helpbox = new HelpBox("Load an Arweave Wallet to upload asset bundles.", HelpBoxMessageType.Error);
@@ -78,27 +70,19 @@ namespace Rawrshak
 
         public void UploadBundles(List<ABData> bundles)
         {
-            if (String.IsNullOrEmpty(mConfig.walletAddress))
+            if (String.IsNullOrEmpty(mConfig.dwsApiKey))
             {
-                AddErrorHelpbox("No Wallet Loaded.");
+                AddErrorHelpbox("No DWS API Key Set");
                 return;
             }
 
-            foreach(var bundle in bundles)
+            if (String.IsNullOrEmpty(mConfig.dwsBucketName))
             {
-                bundleForUpload = bundle;
-                Debug.Log("Uploading bundle: " + bundleForUpload.mName);
-                
-                // This has to be synchronous because the python script reads 
-                // off of the bundle listed here. You might want to just have
-                // the python script load the entire bundle list and upload instead
-                // of doing it one by one. At which point, you can rever this back
-                // to a coroutine
-                // Todo: Update script to upload the entire list of bundle instead
-                // of doing this one by one. 
-                UploadAssetBundle();
-                // EditorCoroutineUtility.StartCoroutine(UploadAssetBundle(), this);
+                AddErrorHelpbox("No DWS Bucket Name Set");
+                return;
             }
+            
+            EditorCoroutineUtility.StartCoroutine(UploadAssetBundle(bundles), this);
         }
 
         public void CheckUploadStatus(ABData bundle)
@@ -108,49 +92,133 @@ namespace Rawrshak
             // check status
             EditorCoroutineUtility.StartCoroutine(CheckStatus(), this);
         }
-        
-        IEnumerator LoadWallet()
-        {
-            PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/VerifyArweaveConnection.py");
-            yield return null;
-        }
-        
-        IEnumerator RefreshBalance()
-        {
-            if (String.IsNullOrEmpty(mConfig.walletAddress))
-            {
-                AddErrorHelpbox("No Wallet Loaded.");
-                yield break;
-            }
-            PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/RefreshWalletBalance.py");
-            yield return null;
-        }
-
-        // Todo: rever this back to a coroutine
-        void UploadAssetBundle()
-        {
-            if (String.IsNullOrEmpty(mConfig.walletAddress))
-            {
-                AddErrorHelpbox("No Wallet Loaded.");
-                // yield break;
-            }
-            PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/UploadAssetBundle.py");
-            // yield return null;
-
-            // Save the info that the python scripts updated
-            EditorUtility.SetDirty(bundleForUpload);
-            AssetDatabase.SaveAssets();
-        }
 
         IEnumerator CheckStatus()
         {
-            PythonRunner.RunFile($"{Application.dataPath}/Editor/Python/CheckStatus.py");
+            // Todo: This checks whether or not the asset is now available. (> X number of confirmations)
             yield return null;
+        }
+        
+        IEnumerator LoadWallet(Button button)
+        {
+            using (UnityWebRequest uwr = UnityWebRequest.Get(walletApiBaseUrl))
+            {
+                // Set API key header
+                uwr.SetRequestHeader("X-APIKey", mConfig.dwsApiKey);
+                // uwr.downloadHandler = new DownloadHandlerBuffer();
+
+                // Request and wait for the desired page.
+                yield return uwr.SendWebRequest();
+
+                if (uwr.result != UnityWebRequest.Result.Success)
+                    Debug.LogError(uwr.error);
+                else
+                {
+                    // Print Body
+                    Debug.Log(uwr.downloadHandler.text);
+                    var body = WalletResponse.Parse(uwr.downloadHandler.text);
+
+                    mConfig.walletAddress = body.address;
+                    // mConfig.walletBalance = String.Format("{0} AR", body.balance.ToString("n2"));
+                    mConfig.walletBalance = String.Format("{0} AR", body.balance);
+                    mConfig.walletFiatBalance = String.Format("{0} {1}", body.fiatBalance.ToString("n2"), body.fiat);
+
+                    // Make sure this file will get saved properly
+                    EditorUtility.SetDirty(mConfig);
+                    AssetDatabase.SaveAssets();
+                }
+            }
+
+            if (!String.IsNullOrEmpty(mConfig.walletAddress))
+            {
+                button.text = "Refresh Balance";
+            }
+
+            yield return null;
+        }
+        IEnumerator UploadAssetBundle(List<ABData> bundles)
+        {
+            foreach(var bundle in bundles)
+            {
+                Debug.Log("Uploading bundle: " + bundle.mName);
+
+                string filePath = bundle.mName;
+                if (!String.IsNullOrEmpty(mConfig.dwsFolderPath))
+                {
+                    filePath = string.Format("{0}/{1}", mConfig.dwsFolderPath, filePath);
+                }
+                string uri = String.Format("{0}/{1}/{2}", uploadApiBaseUrl, mConfig.dwsBucketName, filePath);
+
+                Debug.Log("Uri: " + uri);
+
+                // Upload the file
+                using (var uwr = new UnityWebRequest(uri, UnityWebRequest.kHttpVerbPOST))
+                {
+                    // Set API key header
+                    uwr.SetRequestHeader("X-APIKey", mConfig.dwsApiKey);
+
+                    // Create Upload File Handler and set it to the file location
+                    uwr.uploadHandler = new UploadHandlerFile(bundle.mFileLocation);
+                    uwr.uploadHandler.contentType = "application/octet-stream";
+
+                    uwr.downloadHandler = new DownloadHandlerBuffer();
+
+                    // Send unity request
+                    UnityWebRequestAsyncOperation request = uwr.SendWebRequest();
+                    
+                    float progress = 0.0f;
+                    while (!request.isDone)
+                    {
+                        if (progress < request.progress)
+                        {
+                            progress = request.progress;
+                            Debug.Log(request.progress);
+                        }
+                        yield return null;
+                    }
+                    Debug.Log("Upload Finished!");
+
+                    if (uwr.result != UnityWebRequest.Result.Success)
+                        Debug.LogError(uwr.error);
+                    else
+                    {
+                        // Print Body
+                        // Debug.Log(uwr.downloadHandler.text);
+                        var body = UploadResponse.Parse(uwr.downloadHandler.text);
+
+                        // Update Bundle information
+                        bundle.mTransactionId = body.transactionId;
+                        bundle.mUri = String.Format("{0}/{1}", mConfig.gatewayUri, body.transactionId);
+                        bundle.mUploadTimestamp = DateTime.Now.ToString();
+                        bundle.mNumOfConfirmations = body.status.confirmed.number_of_confirmations;
+                        bundle.mVersion = body.version;
+                        Debug.Log("Version: " + body.version);
+
+                        bundle.mStatus = "Uploaded";
+
+                        UpdateBundleEntry(bundle);
+
+                        // Make sure this file will get saved properly
+                        EditorUtility.SetDirty(bundle);
+                    }
+                }
+            }
+
+            // Save file
+            AssetDatabase.SaveAssets();
         }
 
         public void AddErrorHelpbox(string errorMsg)
         {
             mHelpBoxHolder.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
+        }
+
+        private void UpdateBundleEntry(ABData bundle)
+        {
+            if (bundle.mVisualElement != null)
+            {
+                bundle.mVisualElement.contentContainer.Query<Label>("date-uploaded").First().text = bundle.mUploadTimestamp;
+            }
         }
     }
 }

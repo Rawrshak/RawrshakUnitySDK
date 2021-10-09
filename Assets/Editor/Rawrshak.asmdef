@@ -2,7 +2,6 @@
     "name": "Rawrshak",
     "rootNamespace": "",
     "references": [
-        "Unity.Scripting.Python.Editor",
         "Unity.EditorCoroutines.Editor"
     ],
     "includePlatforms": [
