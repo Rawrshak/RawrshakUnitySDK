@@ -16,11 +16,21 @@
                 <engine:Label class="header-description" text="This is where you will generate the Asset Bundles." />
                 
                 <engine:Foldout class="foldout-style" name="settings" text="Asset Bundle Settings">
-                    <editor:EnumField name="build-target" label="Build Target" binding-path="buildTarget" />
+
+                    <engine:Box style="flex-direction: Row;" >
+                        <engine:Label text="Build Target" style="width: 90%; font-size: 14px;"  />
+                        <engine:Label text="Selected" style="width: 10%; -unity-text-align: middle-right; font-size: 14px;" />
+                    </engine:Box> 
+
+                    <engine:Box name="build-targets" />
+
                     <engine:Button name="generate-asset-bundle-button" text="Generate Asset Bundles" />
                 </engine:Foldout>
 
                 <engine:Foldout class="foldout-style" name="untracked-asset-bundles" text="Untracked Asset Bundles">
+                    
+                    <!-- Todo: Delete build-target later -->
+                    <editor:EnumField name="build-target" label="Build Target" binding-path="buildTarget" />
 
                     <engine:Box style="flex-direction: Row;" >
                         <engine:Label text="Bundle Name" style="width: 30%; font-size: 14px;"  />
