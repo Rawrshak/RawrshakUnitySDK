@@ -9,12 +9,12 @@ using Unity.EditorCoroutines.Editor;
 
 namespace Rawrshak
 {
-    public class ABViewer : ScriptableObject
+    public class AssetBundleViewer : ScriptableObject
     {
         // Singleton instance
-        static ABViewer _instance = null;
+        static AssetBundleViewer _instance = null;
 
-        ABData mAssetBundle;
+        AssetBundleData mAssetBundle;
 
         // UI
         Box mHelpBoxHolder;
@@ -22,20 +22,19 @@ namespace Rawrshak
         
         VisualTreeAsset mBundleTreeAsset;
 
-
-        public static ABViewer Instance
+        public static AssetBundleViewer Instance
         {
             get
             {
                 if (!_instance)
-                    _instance = FindObjectOfType<ABViewer>();
+                    _instance = FindObjectOfType<AssetBundleViewer>();
                 if (!_instance)
-                    _instance = ScriptableObject.CreateInstance<ABViewer>();
+                    _instance = ScriptableObject.CreateInstance<AssetBundleViewer>();
                 return _instance;
             }
         }
 
-        public void SetAssetBundle(ABData assetBundle)
+        public void SetAssetBundle(AssetBundleData assetBundle)
         {
             mAssetBundle = assetBundle;
 
@@ -66,7 +65,7 @@ namespace Rawrshak
             mHelpBoxHolder.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
         }
 
-        private IEnumerator QueryUploadCost(ABData bundle)
+        private IEnumerator QueryUploadCost(AssetBundleData bundle)
         {
             // Todo: Implement this when you have the Estimate Cost API
             bundle.mUploadCost = 0.0f;

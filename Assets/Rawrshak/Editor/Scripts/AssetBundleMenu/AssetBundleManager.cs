@@ -11,10 +11,10 @@ using System.IO;
 
 namespace Rawrshak
 {
-    public class ABManager : ScriptableObject
+    public class AssetBundleManager : ScriptableObject
     {
         // Singleton instance
-        static ABManager _instance = null;
+        static AssetBundleManager _instance = null;
         
         // Static Properties
 
@@ -22,11 +22,11 @@ namespace Rawrshak
         private string mAssetBundleDirectory; // Asset Bundle Directory
         private AssetBundle mFolderObj; // Asset Bundle Folder Object
         private AssetBundleManifest mManifest; // Asset Bundle Folder Manifest Object
-        private UnityEvent<ABData> bundleSelected = new UnityEvent<ABData>();
+        private UnityEvent<AssetBundleData> bundleSelected = new UnityEvent<AssetBundleData>();
         private SupportedBuildTargets mCurrentBuildTarget;
         private float mEstimatedTotalCost;
 
-        Dictionary<string, ABData> mUntrackedAssetBundles;
+        Dictionary<string, AssetBundleData> mUntrackedAssetBundles;
         
         // UI
         Box mUntrackedAssetBundleHolder;
@@ -35,15 +35,15 @@ namespace Rawrshak
         VisualTreeAsset mUntrackedBundleEntry;
 
 
-        public static ABManager Instance
+        public static AssetBundleManager Instance
         {
             get
             {
                 if (!_instance)
-                    _instance = FindObjectOfType<ABManager>();
+                    _instance = FindObjectOfType<AssetBundleManager>();
                 if (!_instance)
                 {
-                    _instance = ScriptableObject.CreateInstance<ABManager>();
+                    _instance = ScriptableObject.CreateInstance<AssetBundleManager>();
                     
                     _instance.mCurrentBuildTarget = AssetBundleMenuConfig.Instance.buildTarget;
                     _instance.LoadAssetBundle(AssetBundleMenuConfig.Instance.assetBundleFolder, AssetBundleMenuConfig.Instance.buildTarget);
@@ -55,7 +55,7 @@ namespace Rawrshak
 
         public void OnEnable()
         {
-            mUntrackedAssetBundles = new Dictionary<string, ABData>();
+            mUntrackedAssetBundles = new Dictionary<string, AssetBundleData>();
         }
 
         public void OnDisable()
@@ -68,10 +68,10 @@ namespace Rawrshak
 
             // Save any asset bundles whose data changed
             AssetDatabase.SaveAssets();
-            Debug.Log("ABManager OnDisable");
+            Debug.Log("AssetBundleManager OnDisable");
         }
 
-        public void SetBundleSelectedCallback(UnityAction<ABData> bundleSelectedCallback)
+        public void SetBundleSelectedCallback(UnityAction<AssetBundleData> bundleSelectedCallback)
         {
             bundleSelected.AddListener(bundleSelectedCallback);
         }
@@ -133,7 +133,7 @@ namespace Rawrshak
                     {
                         // find or add the asset bundle in the new asset bundle lists
                         string fileLocation = Application.dataPath + "/" + mAssetBundleDirectory + "/" + name;
-                        ABData bundle = ABData.CreateInstance(hash, name, fileLocation, mCurrentBuildTarget);
+                        AssetBundleData bundle = AssetBundleData.CreateInstance(hash, name, fileLocation, mCurrentBuildTarget);
                         mUntrackedAssetBundles.Add(name, bundle);
                     }
                     
@@ -214,7 +214,7 @@ namespace Rawrshak
             mHelpBoxHolder.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
         }
 
-        private IEnumerator UpdateEstimatedCost(ABData bundle, bool isSelected)
+        private IEnumerator UpdateEstimatedCost(AssetBundleData bundle, bool isSelected)
         {
             // Todo: Implement this when you have the Estimate Cost API
             mEstimatedTotalCost += (isSelected) ? 10.0f : -10.0f;

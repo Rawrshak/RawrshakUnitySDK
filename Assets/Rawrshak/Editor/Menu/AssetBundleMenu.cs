@@ -16,8 +16,8 @@ namespace Rawrshak
     {
         // Private Menu Properties
         AssetBundleMenuConfig mConfig;
-        ABManager mAssetBundleManager;
-        ABViewer mViewer;
+        AssetBundleManager mAssetBundleManager;
+        AssetBundleViewer mViewer;
 
         // UI
         Box mHelpBoxHolder;
@@ -65,8 +65,8 @@ namespace Rawrshak
 
             // Load Rawrshak Settings (and Initialize if necessary)
             mConfig = AssetBundleMenuConfig.Instance;
-            mAssetBundleManager = ABManager.Instance;
-            mViewer = ABViewer.Instance;
+            mAssetBundleManager = AssetBundleManager.Instance;
+            mViewer = AssetBundleViewer.Instance;
 
             // Set BundleSelected callback
             mAssetBundleManager.SetBundleSelectedCallback(mViewer.SetAssetBundle);

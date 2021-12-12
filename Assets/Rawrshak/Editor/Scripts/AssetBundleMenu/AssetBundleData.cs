@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Rawrshak
 {
     [Serializable]
-    public class ABData : ScriptableObject
+    public class AssetBundleData : ScriptableObject
     {
         public string mHash;
         public string mName;
@@ -29,9 +29,9 @@ namespace Rawrshak
         [NonSerialized] 
         public bool mSelectedForUploading;
 
-        public static ABData CreateInstance(Hash128 hash, string name, string fileLocation, SupportedBuildTargets buildTarget)
+        public static AssetBundleData CreateInstance(Hash128 hash, string name, string fileLocation, SupportedBuildTargets buildTarget)
         {
-            var data = ScriptableObject.CreateInstance<ABData>();
+            var data = ScriptableObject.CreateInstance<AssetBundleData>();
             data.Init(hash, name, fileLocation, buildTarget);
             return data;
         }
