@@ -45,8 +45,8 @@ namespace Rawrshak
                 {
                     _instance = ScriptableObject.CreateInstance<AssetBundleManager>();
                     
-                    _instance.mCurrentBuildTarget = AssetBundleMenuConfig.Instance.buildTarget;
-                    _instance.LoadAssetBundle(AssetBundleMenuConfig.Instance.assetBundleFolder, AssetBundleMenuConfig.Instance.buildTarget);
+                    _instance.mCurrentBuildTarget = AssetBundleMenuConfig.Instance.selectedBuildTarget;
+                    _instance.LoadAssetBundle(AssetBundleMenuConfig.Instance.selectedTargetBuildAssetBundleFolder, AssetBundleMenuConfig.Instance.selectedBuildTarget);
                         
                 }
                 return _instance;

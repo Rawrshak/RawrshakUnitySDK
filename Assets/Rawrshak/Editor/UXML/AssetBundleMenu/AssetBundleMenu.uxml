@@ -28,9 +28,7 @@
                 </engine:Foldout>
 
                 <engine:Foldout class="foldout-style" name="untracked-asset-bundles" text="Untracked Asset Bundles">
-                    
-                    <!-- Todo: Delete build-target later -->
-                    <editor:EnumField name="build-target" label="Build Target" binding-path="buildTarget" />
+                    <editor:EnumField name="build-target" label="Selected Build Target" binding-path="buildTarget" />
 
                     <engine:Box style="flex-direction: Row;" >
                         <engine:Label text="Bundle Name" style="width: 30%; font-size: 14px;"  />

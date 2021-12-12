@@ -10,8 +10,8 @@ namespace Rawrshak
     {
         static AssetBundleMenuConfig _instance = null;
 
-        public string assetBundleFolder;
-        public SupportedBuildTargets buildTarget;
+        public string selectedTargetBuildAssetBundleFolder;
+        public SupportedBuildTargets selectedBuildTarget;
 
         public static AssetBundleMenuConfig Instance
         {
@@ -22,8 +22,8 @@ namespace Rawrshak
                 if (!_instance)
                 {
                     _instance = ScriptableObject.CreateInstance<AssetBundleMenuConfig>();
-                    _instance.buildTarget = SupportedBuildTargets.StandaloneWindows;
-                    _instance.assetBundleFolder = String.Format("{0}/{1}", "Rawrshak/AssetBundles", _instance.buildTarget.ToString());
+                    _instance.selectedBuildTarget = SupportedBuildTargets.StandaloneWindows;
+                    _instance.selectedTargetBuildAssetBundleFolder = String.Format("{0}/{1}", "Rawrshak/AssetBundles", _instance.selectedBuildTarget.ToString());
                 }
                 return _instance;
             }

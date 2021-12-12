@@ -30,6 +30,7 @@ namespace Rawrshak
         static Color selectedBGColor = new Color(90f/255f, 90f/255f, 90f/255f, 1f);
         static Color unselectedBGColor = new Color(60f/255f, 60f/255f, 60f/255f, 1f);
 
+        HashSet<SupportedBuildTargets> selectedBuildTargets = new HashSet<SupportedBuildTargets>();
 
         [MenuItem("Rawrshak/Asset Bundles")]
         public static void ShowExample()
@@ -52,6 +53,7 @@ namespace Rawrshak
         public void OnDisable()
         {
             AssetDatabase.SaveAssets();
+            selectedBuildTargets.Clear();
 
             Debug.Log("AssetBundleMenu Disabled.");
         }
@@ -89,19 +91,60 @@ namespace Rawrshak
         private void LoadUI() {
             // Build Target enum
             var settingsFoldout = rootVisualElement.Query<Foldout>("settings").First();
-            var buildTargetEnumField = rootVisualElement.Query<EnumField>("build-target").First();
+            var buildTargetsHolder = rootVisualElement.Query<Box>("build-targets").First();
+            
+            var buildTargetEntry = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Rawrshak/Editor/UXML/AssetBundleMenu/BuildTargets.uxml");
+
+            // For each build target
+            foreach(var buildTarget in Enum.GetValues(typeof(SupportedBuildTargets)))
+            {
+                TemplateContainer entryTree = buildTargetEntry.CloneTree();
+                entryTree.contentContainer.Query<Label>("build-target").First().text = buildTarget.ToString();
+
+                // Set Toggle Callback
+                var selectedToggle = entryTree.contentContainer.Query<Toggle>("build-target-selected").First();
+                selectedToggle.RegisterCallback<ChangeEvent<bool>>((evt) => {
+                    SupportedBuildTargets selected = (SupportedBuildTargets)buildTarget;
+
+                    if (!(evt.target as Toggle).value)
+                    {
+                        Debug.Log("Deselected: " + selected.ToString());
+                        selectedBuildTargets.Remove(selected);
+                    }
+                    else
+                    {
+                        Debug.Log("Selected: " + selected.ToString());
+                        selectedBuildTargets.Add(selected);
+                    }
+                });
+
+                entryTree.RegisterCallback<MouseDownEvent>((evt) => {
+                    SupportedBuildTargets selected = (SupportedBuildTargets)buildTarget;
+                    if (selectedBuildTargets.Contains(selected))
+                    {
+                        selectedToggle.value = false;
+                    }
+                    else
+                    {
+                        selectedToggle.value = true;
+                    }
+                });
+                
+                buildTargetsHolder.Add(entryTree);
+            }
 
             SerializedObject so = new SerializedObject(mConfig);
             settingsFoldout.Bind(so);
 
-            buildTargetEnumField.Init(mConfig.buildTarget);
+            var buildTargetEnumField = rootVisualElement.Query<EnumField>("build-target").First();
+            buildTargetEnumField.Init(mConfig.selectedBuildTarget);
             buildTargetEnumField.RegisterCallback<ChangeEvent<System.Enum>>((evt) => {
                 // Update the Build Target
                 var newTarget = (Rawrshak.SupportedBuildTargets)evt.newValue;
                 var newDirectory = String.Format("{0}/{1}", ASSET_BUNDLES_FOLDER, newTarget.ToString());
                 
                 // Update Asset Bundles Target Location
-                so.FindProperty("assetBundleFolder").stringValue = newDirectory;
+                so.FindProperty("selectedTargetBuildAssetBundleFolder").stringValue = newDirectory;
                 so.ApplyModifiedProperties();
 
                 mAssetBundleManager.LoadAssetBundle(newDirectory, newTarget);
@@ -111,13 +154,17 @@ namespace Rawrshak
             // Generate Asset Bundles Button
             var generateAssetBundlesButton = rootVisualElement.Query<Button>("generate-asset-bundle-button").First();
             generateAssetBundlesButton.clicked += () => {
-                Debug.Log("Selected Target: " + mConfig.buildTarget);
-                Debug.Log("Folder Asset Bundles: " + mConfig.assetBundleFolder);
+                // Debug.Log("Selected Target: " + mConfig.selectedBuildTarget);
+                // Debug.Log("Folder Asset Bundles: " + mConfig.selectedTargetBuildAssetBundleFolder);
                 
-                CreateAssetBundles.BuildAllAssetBundles(mConfig.buildTarget, mConfig.assetBundleFolder);
+                foreach (SupportedBuildTargets buildTarget in selectedBuildTargets)
+                {
+                    var directory = String.Format("{0}/{1}", ASSET_BUNDLES_FOLDER, buildTarget.ToString());
+                    CreateAssetBundles.BuildAllAssetBundles(buildTarget, directory);
+                }
                 
                 // Refresh New Asset Bundles
-                mAssetBundleManager.LoadAssetBundle(mConfig.assetBundleFolder, mConfig.buildTarget);
+                mAssetBundleManager.LoadAssetBundle(mConfig.selectedTargetBuildAssetBundleFolder, mConfig.selectedBuildTarget);
                 mAssetBundleManager.ReloadUntrackedAssetBundles();
             };
             
