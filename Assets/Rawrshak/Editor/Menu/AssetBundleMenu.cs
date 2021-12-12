@@ -18,7 +18,6 @@ namespace Rawrshak
         AssetBundleMenuConfig mConfig;
         ABManager mAssetBundleManager;
         ABViewer mViewer;
-        // public static UploadManager mUploadManager;
 
         // UI
         Box mHelpBoxHolder;
@@ -54,10 +53,6 @@ namespace Rawrshak
         {
             AssetDatabase.SaveAssets();
 
-            // ScriptableObject.DestroyImmediate(mAssetBundleManager);
-            // ScriptableObject.DestroyImmediate(mViewer);
-            // ScriptableObject.DestroyImmediate(mUploadManager);
-
             Debug.Log("AssetBundleMenu Disabled.");
         }
 
@@ -75,8 +70,6 @@ namespace Rawrshak
 
             // Set BundleSelected callback
             mAssetBundleManager.SetBundleSelectedCallback(mViewer.SetAssetBundle);
-            // mAssetBundleManager.SetUploadBundleCallback(mUploadManager.UploadBundles);
-            // mViewer.SetCheckStatusCallback(mUploadManager.CheckUploadStatus);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -103,7 +96,7 @@ namespace Rawrshak
 
             buildTargetEnumField.Init(mConfig.buildTarget);
             buildTargetEnumField.RegisterCallback<ChangeEvent<System.Enum>>((evt) => {
-                // // Update the Build Target
+                // Update the Build Target
                 var newTarget = (Rawrshak.SupportedBuildTargets)evt.newValue;
                 var newDirectory = String.Format("{0}/{1}", ASSET_BUNDLES_FOLDER, newTarget.ToString());
                 
@@ -133,9 +126,6 @@ namespace Rawrshak
 
             // Load Manager UI
             mAssetBundleManager.LoadUI(rootVisualElement);
-            
-            // // Load Manager UI
-            // mUploadManager.LoadUI(rootVisualElement);
 
             // Load Viewer
             mViewer.LoadUI(rootVisualElement);

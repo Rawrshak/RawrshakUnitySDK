@@ -22,7 +22,6 @@ namespace Rawrshak
         Button mVerifyButton;
         
         VisualTreeAsset mBundleTreeAsset;
-        UnityEvent<ABData> mCheckUploadStatusCallback = new UnityEvent<ABData>();
 
 
         public static ABViewer Instance
@@ -49,37 +48,14 @@ namespace Rawrshak
             SerializedObject so = new SerializedObject(mAssetBundle);
             bundleView.Bind(so);
 
-            // Register button click for check status callback
-            var checkStatusButton = bundleTree.contentContainer.Query<Button>("check-status").First();
-            checkStatusButton.clicked += () => {
-                if (String.IsNullOrEmpty(mAssetBundle.mTransactionId))
-                {
-                    AddErrorHelpbox("Bundle has not been uploaded yet.");
-                    return;
-                }
-                mCheckUploadStatusCallback.Invoke(mAssetBundle);
-            };
-
             // Verify Button
             mVerifyButton = bundleTree.contentContainer.Query<Button>("verify-asset-bundle-button").First();
-            if (mAssetBundle.mStatus == "Uploaded")
-            {
-                mVerifyButton.SetEnabled(true);
-                mVerifyButton.clicked += () => {
-                    EditorCoroutineUtility.StartCoroutine(Verify(mAssetBundle), this);
-                };
-            }
-            else
-            {
-                mVerifyButton.SetEnabled(false);
-            }
+            mVerifyButton.SetEnabled(true);
+            mVerifyButton.clicked += () => {
+                EditorCoroutineUtility.StartCoroutine(Verify(mAssetBundle), this);
+            };
 
             mViewer.Add(bundleTree);
-        }
-
-        public void SetCheckStatusCallback(UnityAction<ABData> checkUploadStatusCallback)
-        {
-            mCheckUploadStatusCallback.AddListener(checkUploadStatusCallback);
         }
         
         public void LoadUI(VisualElement root)
@@ -100,11 +76,8 @@ namespace Rawrshak
 
         private IEnumerator Verify(ABData bundle)
         {
-            // Todo: Literally just call https://arweave.net/tx/{id}/status
-            // Todo: Verify Status
-            // Todo: Verify Confirmations > 10;
-            // Todo: Download Uri Asset Bundle
-            // Todo: Verify Hash
+            // Todo: Maybe verify 3d asset?
+            Debug.Log("Clicked Asset Verify!");
             yield return null;
         }
 
