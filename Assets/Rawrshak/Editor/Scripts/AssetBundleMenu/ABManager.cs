@@ -14,8 +14,8 @@ namespace Rawrshak
     public class ABManager : ScriptableObject
     {
         // Singleton instance
+        static ABManager _instance = null;
         
-
         // Static Properties
         static string ASSET_BUNDLES_UPLOADED_DIRECTORY = "UploadedAssetBundles";
 
@@ -39,14 +39,23 @@ namespace Rawrshak
         VisualTreeAsset mUploadedBundleEntry;
         VisualTreeAsset mUntrackedBundleEntry;
 
-        public static ABManager CreateInstance(string directory, SupportedBuildTargets buildTarget)
+
+        public static ABManager Instance
         {
-            var manager = ScriptableObject.CreateInstance<ABManager>();
-
-            manager.mCurrentBuildTarget = buildTarget;
-            manager.LoadAssetBundle(directory, buildTarget);
-
-            return manager;
+            get
+            {
+                if (!_instance)
+                    _instance = FindObjectOfType<ABManager>();
+                if (!_instance)
+                {
+                    _instance = ScriptableObject.CreateInstance<ABManager>();
+                    
+                    _instance.mCurrentBuildTarget = AssetBundleMenuConfig.Instance.buildTarget;
+                    _instance.LoadAssetBundle(AssetBundleMenuConfig.Instance.assetBundleFolder, AssetBundleMenuConfig.Instance.buildTarget);
+                        
+                }
+                return _instance;
+            }
         }
 
         public void OnEnable()
@@ -263,9 +272,9 @@ namespace Rawrshak
             }
             
             string folderObjName = builtTarget.ToString();
-            if (File.Exists("Assets/Rawrshak/" + mAssetBundleDirectory + "/" + folderObjName))
+            if (File.Exists("Assets/" + mAssetBundleDirectory + "/" + folderObjName))
             {
-                Debug.Log("Folder Exists! " + mAssetBundleDirectory + "/" + folderObjName);
+                Debug.Log("Folder Exists: Assets/" + mAssetBundleDirectory + "/" + folderObjName);
                 mFolderObj = AssetBundle.LoadFromFile(Application.dataPath + "/" + mAssetBundleDirectory + "/" + folderObjName);
                 mManifest = mFolderObj.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
             }

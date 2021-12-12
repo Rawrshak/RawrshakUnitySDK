@@ -8,7 +8,7 @@ public class CreateAssetBundles
 {
     public static void BuildAllAssetBundles(SupportedBuildTargets buildTarget, string assetBundleDirectory)
     {
-        string directory = "Assets/Rawrshak/" + assetBundleDirectory;
+        string directory = "Assets/" + assetBundleDirectory;
         if(!Directory.Exists(directory))
         {
             Debug.Log("Directory is being created: " + directory);

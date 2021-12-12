@@ -24,10 +24,10 @@ namespace Rawrshak
         Box mHelpBoxHolder;
 
         // Static Properties
-        public static string ASSET_BUNDLES_FOLDER = "AssetBundles";
+        public static string ASSET_BUNDLES_FOLDER = "Rawrshak/AssetBundles";
         public static string RESOURCES_FOLDER = "Assets/Rawrshak/Editor/Resources";
-        public static string ASSET_BUNDLES_MENU_CONFIG_DIRECTORY = "AssetBundlesMenuConfig";
-        static string ASSET_BUNDLES_MENU_CONFIG_FILE = "MenuConfig";
+        public static string ASSET_BUNDLES_MENU_CONFIG_FOLDER_NAME = "AssetBundlesMenuConfig";
+        static string ASSET_BUNDLES_MENU_CONFIG_FILE_NAME = "MenuConfig";
         static Color selectedBGColor = new Color(90f/255f, 90f/255f, 90f/255f, 1f);
         static Color unselectedBGColor = new Color(60f/255f, 60f/255f, 60f/255f, 1f);
 
@@ -54,8 +54,8 @@ namespace Rawrshak
         {
             AssetDatabase.SaveAssets();
 
-            ScriptableObject.DestroyImmediate(mAssetBundleManager);
-            ScriptableObject.DestroyImmediate(mViewer);
+            // ScriptableObject.DestroyImmediate(mAssetBundleManager);
+            // ScriptableObject.DestroyImmediate(mViewer);
             // ScriptableObject.DestroyImmediate(mUploadManager);
 
             Debug.Log("AssetBundleMenu Disabled.");
@@ -63,33 +63,15 @@ namespace Rawrshak
 
         private void LoadData() {
             // Create Settings folder if necessary
-            if(!Directory.Exists(String.Format("{0}/{1}", RESOURCES_FOLDER, ASSET_BUNDLES_MENU_CONFIG_DIRECTORY)))
+            if(!Directory.Exists(String.Format("{0}/{1}", RESOURCES_FOLDER, ASSET_BUNDLES_MENU_CONFIG_FOLDER_NAME)))
             {
-                Directory.CreateDirectory(String.Format("{0}/{1}", RESOURCES_FOLDER, ASSET_BUNDLES_MENU_CONFIG_DIRECTORY));
+                Directory.CreateDirectory(String.Format("{0}/{1}", RESOURCES_FOLDER, ASSET_BUNDLES_MENU_CONFIG_FOLDER_NAME));
             }
 
             // Load Rawrshak Settings (and Initialize if necessary)
-            mConfig = Resources.Load<AssetBundleMenuConfig>(String.Format("{0}/{1}", ASSET_BUNDLES_MENU_CONFIG_DIRECTORY, ASSET_BUNDLES_MENU_CONFIG_FILE));
-            if (mConfig == null)
-            {
-                mConfig = AssetBundleMenuConfig.CreateInstance();
-                AssetDatabase.CreateAsset(mConfig, String.Format("{0}/{1}/{2}.asset", RESOURCES_FOLDER, ASSET_BUNDLES_MENU_CONFIG_DIRECTORY, ASSET_BUNDLES_MENU_CONFIG_FILE));
-            }
-
-            if (mAssetBundleManager == null)
-            {
-                mAssetBundleManager = ABManager.CreateInstance(mConfig.assetBundleFolder, mConfig.buildTarget);
-            }
-
-            // if (mUploadManager == null)
-            // {
-            //     mUploadManager = UploadManager.CreateInstance();
-            // }
-
-            if (mViewer == null)
-            {
-                mViewer = ABViewer.CreateInstance();
-            }
+            mConfig = AssetBundleMenuConfig.Instance;
+            mAssetBundleManager = ABManager.Instance;
+            mViewer = ABViewer.Instance;
 
             // Set BundleSelected callback
             mAssetBundleManager.SetBundleSelectedCallback(mViewer.SetAssetBundle);

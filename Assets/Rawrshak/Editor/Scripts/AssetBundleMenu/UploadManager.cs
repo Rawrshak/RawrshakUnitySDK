@@ -35,11 +35,11 @@ namespace Rawrshak
         public void OnEnable()
         {
             Debug.Log("Initializing UploadManager.");
-            mConfig = Resources.Load<UploadConfig>(String.Format("{0}/{1}", AssetBundleMenu.ASSET_BUNDLES_MENU_CONFIG_DIRECTORY, UPLOAD_CONFIG_FILE));
+            mConfig = Resources.Load<UploadConfig>(String.Format("{0}/{1}", AssetBundleMenu.ASSET_BUNDLES_MENU_CONFIG_FOLDER_NAME, UPLOAD_CONFIG_FILE));
             if (mConfig == null)
             {
                 mConfig = UploadConfig.CreateInstance();
-                AssetDatabase.CreateAsset(mConfig, String.Format("{0}/{1}/{2}.asset", AssetBundleMenu.RESOURCES_FOLDER, AssetBundleMenu.ASSET_BUNDLES_MENU_CONFIG_DIRECTORY, UPLOAD_CONFIG_FILE));
+                AssetDatabase.CreateAsset(mConfig, String.Format("{0}/{1}/{2}.asset", AssetBundleMenu.RESOURCES_FOLDER, AssetBundleMenu.ASSET_BUNDLES_MENU_CONFIG_FOLDER_NAME, UPLOAD_CONFIG_FILE));
             }
             AssetDatabase.SaveAssets();
         }

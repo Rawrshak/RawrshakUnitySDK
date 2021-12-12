@@ -11,6 +11,9 @@ namespace Rawrshak
 {
     public class ABViewer : ScriptableObject
     {
+        // Singleton instance
+        static ABViewer _instance = null;
+
         ABData mAssetBundle;
 
         // UI
@@ -21,9 +24,17 @@ namespace Rawrshak
         VisualTreeAsset mBundleTreeAsset;
         UnityEvent<ABData> mCheckUploadStatusCallback = new UnityEvent<ABData>();
 
-        public static ABViewer CreateInstance()
+
+        public static ABViewer Instance
         {
-            return ScriptableObject.CreateInstance<ABViewer>();
+            get
+            {
+                if (!_instance)
+                    _instance = FindObjectOfType<ABViewer>();
+                if (!_instance)
+                    _instance = ScriptableObject.CreateInstance<ABViewer>();
+                return _instance;
+            }
         }
 
         public void SetAssetBundle(ABData assetBundle)
