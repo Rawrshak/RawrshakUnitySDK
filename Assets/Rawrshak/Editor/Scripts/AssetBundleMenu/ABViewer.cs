@@ -19,7 +19,6 @@ namespace Rawrshak
         // UI
         Box mHelpBoxHolder;
         Box mViewer;
-        Button mVerifyButton;
         
         VisualTreeAsset mBundleTreeAsset;
 
@@ -48,13 +47,6 @@ namespace Rawrshak
             SerializedObject so = new SerializedObject(mAssetBundle);
             bundleView.Bind(so);
 
-            // Verify Button
-            mVerifyButton = bundleTree.contentContainer.Query<Button>("verify-asset-bundle-button").First();
-            mVerifyButton.SetEnabled(true);
-            mVerifyButton.clicked += () => {
-                EditorCoroutineUtility.StartCoroutine(Verify(mAssetBundle), this);
-            };
-
             mViewer.Add(bundleTree);
         }
         
@@ -72,13 +64,6 @@ namespace Rawrshak
         public void AddErrorHelpbox(string errorMsg)
         {
             mHelpBoxHolder.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
-        }
-
-        private IEnumerator Verify(ABData bundle)
-        {
-            // Todo: Maybe verify 3d asset?
-            Debug.Log("Clicked Asset Verify!");
-            yield return null;
         }
 
         private IEnumerator QueryUploadCost(ABData bundle)

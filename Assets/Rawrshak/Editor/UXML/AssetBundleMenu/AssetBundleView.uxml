@@ -16,7 +16,6 @@
             <editor:IntegerField name="file-size" label="File Size (bytes)" binding-path="mFileSize" />
             <editor:FloatField name="upload-cost" label="Upload Cost (AR)" binding-path="mUploadCost" />
             <editor:PropertyField name="assets" label="Asset Names" binding-path="mAssets" />
-            <engine:Button name="verify-asset-bundle-button" text="Verify Uploaded Asset Bundles" />
         </engine:ScrollView >
     </engine:Box> 
     
