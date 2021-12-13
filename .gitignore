@@ -44,3 +44,8 @@ ehthumbs.db
 /Assets/AssetBundles
 /Assets/Rawrshak/Editor/Scripts/TempScripts
 /Assets/Rawrshak/Editor/Scripts/TempScripts.meta
+
+# ====================== #
+# Rawrshak Unity Package #
+# ====================== #
+*.unitypackage
