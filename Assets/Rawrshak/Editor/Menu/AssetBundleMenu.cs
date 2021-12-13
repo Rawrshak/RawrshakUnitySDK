@@ -24,9 +24,6 @@ namespace Rawrshak
 
         // Static Properties
         public static string ASSET_BUNDLES_FOLDER = "Rawrshak/AssetBundles";
-        public static string RESOURCES_FOLDER = "Assets/Rawrshak/Editor/Resources";
-        public static string ASSET_BUNDLES_MENU_CONFIG_FOLDER_NAME = "AssetBundlesMenuConfig";
-        static string ASSET_BUNDLES_MENU_CONFIG_FILE_NAME = "MenuConfig";
         static Color selectedBGColor = new Color(90f/255f, 90f/255f, 90f/255f, 1f);
         static Color unselectedBGColor = new Color(60f/255f, 60f/255f, 60f/255f, 1f);
 
@@ -54,17 +51,12 @@ namespace Rawrshak
         {
             AssetDatabase.SaveAssets();
             selectedBuildTargets.Clear();
+            mAssetBundleManager.ResetCalculator();
 
             Debug.Log("AssetBundleMenu Disabled.");
         }
 
         private void LoadData() {
-            // Create Settings folder if necessary
-            if(!Directory.Exists(String.Format("{0}/{1}", RESOURCES_FOLDER, ASSET_BUNDLES_MENU_CONFIG_FOLDER_NAME)))
-            {
-                Directory.CreateDirectory(String.Format("{0}/{1}", RESOURCES_FOLDER, ASSET_BUNDLES_MENU_CONFIG_FOLDER_NAME));
-            }
-
             // Load Rawrshak Settings (and Initialize if necessary)
             mConfig = AssetBundleMenuConfig.Instance;
             mAssetBundleManager = AssetBundleManager.Instance;
@@ -145,8 +137,10 @@ namespace Rawrshak
                 
                 // Update Asset Bundles Target Location
                 so.FindProperty("selectedTargetBuildAssetBundleFolder").stringValue = newDirectory;
+                so.FindProperty("selectedBuildTarget").enumValueIndex = (int)newTarget;
                 so.ApplyModifiedProperties();
 
+                mAssetBundleManager.ResetCalculator();
                 mAssetBundleManager.LoadAssetBundle(newDirectory, newTarget);
                 mAssetBundleManager.ReloadUntrackedAssetBundles();
             });

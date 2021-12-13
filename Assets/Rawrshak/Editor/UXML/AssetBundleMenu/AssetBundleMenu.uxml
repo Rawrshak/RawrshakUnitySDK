@@ -33,15 +33,20 @@
                     <engine:Box style="flex-direction: Row;" >
                         <engine:Label text="Bundle Name" style="width: 30%; font-size: 14px;"  />
                         <engine:Label text="Hash Id" style="width: 45%; -unity-text-align: middle-center; font-size: 14px;" />
-                        <engine:Label text="Upload" style="width: 25%; -unity-text-align: middle-right; font-size: 14px;" />
+                        <engine:Label text="Select" style="width: 25%; -unity-text-align: middle-right; font-size: 14px;" />
                     </engine:Box> 
 
                     <engine:Box name="new-entries" />
                 
                     <engine:Box style="flex-direction: Row;" >
-                        <engine:Label text="Estimated Cost" style="width: 30%; -unity-text-align: middle-left; font-size: 14px;"  />
-                        <engine:Label name="estimated-cost" text="0.0 AR" style="width: 70%; -unity-text-align: middle-right; font-size: 14px;" />
+                        <engine:Label text="Total Storage (kb)" style="width: 30%; -unity-text-align: middle-left; font-size: 14px;" />
+                        <engine:Label name="total-storage" text="0.00" style="width: 70%; -unity-text-align: middle-right; font-size: 14px;" />
                     </engine:Box> 
+                    <engine:Box style="flex-direction: Row;" >
+                        <engine:Label class="header-description" name="price-calculator" text="*Please refer to ArDrive calculator for more upload pricing info." style="width: 85%; -unity-text-align: middle-left;"/>
+                        <engine:Button name="calculator" text="Calculator" style="width: 15%;" />
+                    </engine:Box> 
+                    
                 </engine:Foldout>
 
                 <engine:Box name="helpbox-holder" />

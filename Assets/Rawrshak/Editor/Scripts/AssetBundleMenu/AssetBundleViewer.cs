@@ -64,13 +64,6 @@ namespace Rawrshak
         {
             mHelpBoxHolder.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
         }
-
-        private IEnumerator QueryUploadCost(AssetBundleData bundle)
-        {
-            // Todo: Implement this when you have the Estimate Cost API
-            bundle.mUploadCost = 0.0f;
-            yield return null;
-        }
     }
 
 }

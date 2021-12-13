@@ -31,7 +31,7 @@ namespace Rawrshak
         // UI
         Box mUntrackedAssetBundleHolder;
         Box mHelpBoxHolder;
-        Label mEstimatedTotalCostLabel;
+        Label mTotalStorage;
         VisualTreeAsset mUntrackedBundleEntry;
 
 
@@ -86,8 +86,13 @@ namespace Rawrshak
             // Load Entry UXMLs
             mUntrackedBundleEntry = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Rawrshak/Editor/UXML/AssetBundleMenu/UntrackedAssetBundle.uxml");
 
-            mEstimatedTotalCostLabel = root.Query<Label>("estimated-cost").First();
+            mTotalStorage = root.Query<Label>("total-storage").First();
+            var calculatorButton = root.Query<Button>("calculator").First();
+            calculatorButton.clicked += () => {
+                Application.OpenURL("https://prices.ardrive.io/");
+            };
             
+            LoadAssetBundle(AssetBundleMenuConfig.Instance.selectedTargetBuildAssetBundleFolder, AssetBundleMenuConfig.Instance.selectedBuildTarget);
             ReloadUntrackedAssetBundles();
         }
         
@@ -101,12 +106,6 @@ namespace Rawrshak
             if (mManifest)
             {
                 var bundleNames = mManifest.GetAllAssetBundles();
-                
-                // mark all bundles for delete
-                foreach(var bundle in mUntrackedAssetBundles)
-                {
-                    bundle.Value.mMarkedForDelete = true;
-                }
 
                 foreach(string name in bundleNames)
                 {
@@ -118,11 +117,10 @@ namespace Rawrshak
                         var bundle = mUntrackedAssetBundles[name];
                         bundle.mHashId = hash;
                         bundle.mHash = hash.ToString();
-                        bundle.mSelectedForUploading = false;
+                        bundle.mSelected = false;
                         bundle.mFileLocation = Application.dataPath + "/" + mAssetBundleDirectory + "/" + name;
                         bundle.mVisualElement.contentContainer.Query<Label>("asset-bundle-hash").First().text = hash.ToString();
                         bundle.mVisualElement.contentContainer.Query<Toggle>("asset-bundle-selected").First().value = false;
-                        bundle.mMarkedForDelete = false;
                         bundle.mBuildTarget = mCurrentBuildTarget;
                         bundle.UpdateAssetNames();
                         bundle.UpdateFileSize();
@@ -147,10 +145,10 @@ namespace Rawrshak
                     // Set Toggle Callback
                     var selectedToggle = entryTree.contentContainer.Query<Toggle>("asset-bundle-selected").First();
                     selectedToggle.RegisterCallback<ChangeEvent<bool>>((evt) => {
-                        addedBundle.mSelectedForUploading = (evt.target as Toggle).value;
+                        addedBundle.mSelected = (evt.target as Toggle).value;
 
                         // If Bundle is selected, get the estimated cost and add it to total cost;
-                        EditorCoroutineUtility.StartCoroutine(UpdateEstimatedCost(addedBundle, addedBundle.mSelectedForUploading), this);
+                        EditorCoroutineUtility.StartCoroutine(UpdateEstimatedCost(addedBundle, addedBundle.mSelected), this);
                     });
 
                     // Select Asset Bundle Callback to show info
@@ -163,22 +161,6 @@ namespace Rawrshak
                     // Add entry to UI
                     Debug.Log("Adding Untracked Asset Bundle: " + addedBundle.mName);
                     mUntrackedAssetBundleHolder.Add(entryTree);
-                }
-
-                // Delete bundles marked for delete
-                List<string> bundlesToDelete = new List<string>();
-                foreach(var bundle in mUntrackedAssetBundles)
-                {
-                    if (bundle.Value.mMarkedForDelete)
-                    {
-                        mUntrackedAssetBundleHolder.Remove(bundle.Value.mVisualElement);
-                        bundlesToDelete.Add(bundle.Key);
-                    }
-                }
-
-                foreach(var name in bundlesToDelete)
-                {
-                    mUntrackedAssetBundles.Remove(name);
                 }
             }
             else
@@ -201,9 +183,9 @@ namespace Rawrshak
             }
             
             string folderObjName = builtTarget.ToString();
+            Debug.Log("Folder Exists: Assets/" + mAssetBundleDirectory + "/" + folderObjName);
             if (File.Exists("Assets/" + mAssetBundleDirectory + "/" + folderObjName))
             {
-                Debug.Log("Folder Exists: Assets/" + mAssetBundleDirectory + "/" + folderObjName);
                 mFolderObj = AssetBundle.LoadFromFile(Application.dataPath + "/" + mAssetBundleDirectory + "/" + folderObjName);
                 mManifest = mFolderObj.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
             }
@@ -214,11 +196,16 @@ namespace Rawrshak
             mHelpBoxHolder.Add(new HelpBox(errorMsg, HelpBoxMessageType.Error));
         }
 
+        public void ResetCalculator()
+        {
+            mEstimatedTotalCost = 0.0f;
+            mTotalStorage.text = String.Format("{0}", mEstimatedTotalCost.ToString("n2"));
+        }
+
         private IEnumerator UpdateEstimatedCost(AssetBundleData bundle, bool isSelected)
         {
-            // Todo: Implement this when you have the Estimate Cost API
-            mEstimatedTotalCost += (isSelected) ? 10.0f : -10.0f;
-            mEstimatedTotalCostLabel.text = String.Format("{0} AR", mEstimatedTotalCost.ToString("n2"));
+            mEstimatedTotalCost += ((isSelected) ? bundle.mFileSize : -bundle.mFileSize) / 1000.0f;
+            mTotalStorage.text = String.Format("{0}", mEstimatedTotalCost.ToString("n2"));
             yield return null;
         }
     }

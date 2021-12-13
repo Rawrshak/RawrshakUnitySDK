@@ -17,7 +17,6 @@ namespace Rawrshak
         public SupportedEngine mEngine = SupportedEngine.Unity;
         public string mUnityVersion;
         public int mVersion;
-        public float mUploadCost;
 
         // Non-Serialized Data
         [NonSerialized]
@@ -25,9 +24,7 @@ namespace Rawrshak
         [NonSerialized]
         public TemplateContainer mVisualElement;
         [NonSerialized] 
-        public bool mMarkedForDelete;
-        [NonSerialized] 
-        public bool mSelectedForUploading;
+        public bool mSelected;
 
         public static AssetBundleData CreateInstance(Hash128 hash, string name, string fileLocation, SupportedBuildTargets buildTarget)
         {
@@ -43,12 +40,10 @@ namespace Rawrshak
             mFileLocation = fileLocation;
             mHashId = hash;
             mVisualElement = null;
-            mSelectedForUploading = false;
-            mMarkedForDelete = false;
+            mSelected = false;
             mBuildTarget = buildTarget;
             mUnityVersion = Application.unityVersion;
             mVersion = 0;
-            mUploadCost = 0.0f;
             UpdateFileSize();
             UpdateAssetNames();
         }
