@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:Box name="built-target-box" style="flex-direction: Row; font-size: 12px;" >
+        <engine:Label name="build-target" style="width: 90%;"/>
+        <engine:Toggle name="build-target-selected" value="false" />
+    </engine:Box> 
+    
+</engine:UXML>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:Box name="rawrshak-label-box">
+        <engine:Label name="rawrshak-label" text="Rawrshak" />
+    </engine:Box>
+
+    <engine:Box name="main-page" style="flex-direction: Row;" >
+        <engine:Box name="left-pane" style="width: 49.75%;" >
+            <engine:ScrollView >
+                <engine:Label class="header" text="Asset Bundles" />
+                <engine:Label class="header-description" text="This is where you will generate the Asset Bundles." />
+                
+                <engine:Foldout class="foldout-style" name="settings" text="Asset Bundle Settings">
+
+                    <engine:Box style="flex-direction: Row;" >
+                        <engine:Label text="Build Target" style="width: 90%; font-size: 14px;"  />
+                        <engine:Label text="Selected" style="width: 10%; -unity-text-align: middle-right; font-size: 14px;" />
+                    </engine:Box> 
+
+                    <engine:Box name="build-targets" />
+
+                    <engine:Button name="generate-asset-bundle-button" text="Generate Asset Bundles" />
+                </engine:Foldout>
+
+                <engine:Foldout class="foldout-style" name="untracked-asset-bundles" text="Untracked Asset Bundles">
+                    <editor:EnumField name="build-target" label="Selected Build Target" binding-path="buildTarget" />
+
+                    <engine:Box style="flex-direction: Row;" >
+                        <engine:Label text="Bundle Name" style="width: 30%; font-size: 14px;"  />
+                        <engine:Label text="Hash Id" style="width: 45%; -unity-text-align: middle-center; font-size: 14px;" />
+                        <engine:Label text="Select" style="width: 25%; -unity-text-align: middle-right; font-size: 14px;" />
+                    </engine:Box> 
+
+                    <engine:Box name="new-entries" />
+                
+                    <engine:Box style="flex-direction: Row;" >
+                        <engine:Label text="Total Storage (kb)" style="width: 30%; -unity-text-align: middle-left; font-size: 14px;" />
+                        <engine:Label name="total-storage" text="0.00" style="width: 70%; -unity-text-align: middle-right; font-size: 14px;" />
+                    </engine:Box> 
+                    <engine:Box style="flex-direction: Row;" >
+                        <engine:Label class="header-description" name="price-calculator" text="*Please refer to ArDrive calculator for more upload pricing info." style="width: 85%; -unity-text-align: middle-left;"/>
+                        <engine:Button name="calculator" text="Calculator" style="width: 15%;" />
+                    </engine:Box> 
+                    
+                </engine:Foldout>
+
+                <engine:Box name="helpbox-holder" />
+            </engine:ScrollView >
+        </engine:Box>
+
+        <engine:Box style="width: 0.5%; background-color: rgb(0, 0, 0)" />
+
+        <engine:Box name="asset-bundle-viewer" style="width: 49.75%;" />
+    </engine:Box>
+    
+</engine:UXML>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:Box name="info-box" style="font-size: 14px;" >
+        <engine:ScrollView >
+            <engine:TextField name="name" label="Name" binding-path="mName" />
+            <engine:TextField name="hash" label="Hash Id" binding-path="mHash" />
+            <engine:TextField name="local-file-location" label="Local File Location" binding-path="mFileLocation" />
+            <editor:EnumField name="build-target" label="Build Target" binding-path="mBuildTarget" />
+            <editor:EnumField name="engine" label="Engine" binding-path="mEngine" />
+            <engine:TextField name="unity-version" label="Unity Version" binding-path="mUnityVersion" />
+            <editor:IntegerField name="file-size" label="File Size (bytes)" binding-path="mFileSize" />
+            <editor:PropertyField name="assets" label="Asset Names" binding-path="mAssets" />
+        </engine:ScrollView >
+    </engine:Box> 
+    
+</engine:UXML>
