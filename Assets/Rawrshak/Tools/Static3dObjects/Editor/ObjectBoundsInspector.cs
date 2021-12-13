@@ -20,7 +20,7 @@ public class ObjectBoundsInspector : Editor
         base.OnInspectorGUI();
 
         // Draw a few buttons
-        if (GUILayout.Button("Refresh Target Object"))
+        if (GUILayout.Button("Load Target Object"))
         {
             script.RefreshTargetObject();
         }
